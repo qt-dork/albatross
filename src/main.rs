@@ -1,6 +1,11 @@
 mod jandom;
 
 fn main() {
+    let mut rng = jandom::Random::new(0);
+
+    for _ in 0..10 {
+        println!("{}", rng.next_f64());
+    }
     println!("Hello, world!");
 }
 
@@ -18,30 +23,30 @@ fn main() {
 // When all games are over, the program ends
 // Then the results of the games are added to the database and updated
 
-struct Game {
-    rng: u32, // Change later. Needs to be rng,
-    game_logs: Vec<String>,
-}
+// struct Game {
+//     rng: u32, // Change later. Needs to be rng,
+//     game_logs: Vec<String>,
+// }
 
-impl Game {
-    fn new() -> Game {
-        // Instantiate game
-    }
+// impl Game {
+//     fn new() -> Game {
+//         // Instantiate game
+//     }
 
-    fn next(&self) {
-        // run next state of game
-        let mut next = self.clone();
+//     fn next(&self) {
+//         // run next state of game
+//         let mut next = self.clone();
 
-        // Run loop
+//         // Run loop
 
-        self = next;
-    }
+//         self = next;
+//     }
 
-    fn is_over(&self) -> bool {
-        // Check if game is over
-    }
+//     fn is_over(&self) -> bool {
+//         // Check if game is over
+//     }
 
-    fn get_logs(&self) -> Vec<String> {
-        // Get logs
-    }
-}
+//     fn get_logs(&self) -> Vec<String> {
+//         // Get logs
+//     }
+// }
