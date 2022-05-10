@@ -1,4 +1,4 @@
-mod jandom;
+use jandom;
 
 fn main() {
     let mut rng = jandom::Random::new(0);
