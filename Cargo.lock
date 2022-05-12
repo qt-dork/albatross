@@ -5,3 +5,12 @@ version = 3
 [[package]]
 name = "alt_league_blaseball"
 version = "0.1.0"
+dependencies = [
+ "javarandom",
+]
+
+[[package]]
+name = "javarandom"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "45c9b07eb63ae8bc97775de640e1badc12bf226125734f018632a7f3f22c148e"

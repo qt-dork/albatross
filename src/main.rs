@@ -1,10 +1,12 @@
-mod jandom;
+//mod jandom;
 mod game;
 mod weather;
 mod team;
 
+use javarandom::JavaRandom;
+
 fn main() {
-    let mut rng = jandom::Random::new(0);
+    let rng = JavaRandom::with_seed(0);
     for i in 0..28 {
         println!("{}", weather::Bird::BirdMessage(i, rng));
     }

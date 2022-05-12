@@ -1,7 +1,7 @@
 // The goal of this file is to generate the weather conditions for use in the game.rs file.
 // Temporarily we will be using
 
-use crate::jandom::Random;
+use javarandom::JavaRandom;
 //use std::fmt;
 
 pub enum WeatherOptions {
@@ -19,7 +19,7 @@ pub struct Bird {
 }
 
 impl Bird {
-    fn BirdMessage(n: i32, mut random: Random) -> String {
+    pub fn BirdMessage(n: i32, mut random: JavaRandom) -> String {
         match n {
         0 => "Seeing a lot of birds today.".to_string(),
         1 => "The birds continue to stare.".to_string(),
@@ -33,10 +33,10 @@ impl Bird {
         9 => "The birds stare into the sun.".to_string(),
         10 => "The birds give you the shivers.".to_string(),
         11 => "Birds.".to_string(),
-        12 => format!("{} birds.", (random.next_f64() * 1000.0).trunc() as i32),
+        12 => format!("{} birds.", (random.next_float() * 1000.0).trunc() as i32),
         13 => "Something isn't right about these birds.".to_string(),
         14 => "A bird pecks the outfield for features.".to_string(),
-        15 => format!("A rogue umpire incinerated Bird {}!\nThey're replaced by Bird {}.", (random.next_f64() * 1000.0).trunc() as i32, (random.next_f64() * 1000.0).trunc() as i32),
+        15 => format!("A rogue umpire incinerated Bird {}!\nThey're replaced by Bird {}.", (random.next_float() * 1000.0).trunc() as i32, (random.next_float() * 1000.0).trunc() as i32),
         16 => "Is that a normal number of eyes for a bird?".to_string(),
         17 => "Another bird lands in the rafters.".to_string(),
         18 => "I hate these birds.".to_string(),

@@ -5,7 +5,7 @@
 // So I'm just going to use what I need.
 
 use std::fmt;
-use std::sync::atomic::{AtomicI64, Ordering};
+//use std::sync::atomic::{AtomicI64, Ordering};
 
 const MULTIPLIER: i64 = 0x5DEECE66D;
 const INCREMENT: i64 = 0xB;
@@ -13,7 +13,7 @@ const MASK: i64 = (1 << 48) - 1;
 
 #[derive(Copy, Clone)]
 pub struct Random {
-    seed: AtomicI64,
+    seed: i64,
 }
 
 impl Random {
@@ -22,7 +22,7 @@ impl Random {
     /// This has the same effect as calling the constructor with seed param in Java.
     pub fn new(seed: i64) -> Random {
         Random {
-            seed: AtomicI64::new(Self::initialize_state(seed))
+            seed: i64::new(Self::initialize_state(seed))
         }
     }
 
