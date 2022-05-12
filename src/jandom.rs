@@ -11,9 +11,11 @@ const MULTIPLIER: i64 = 0x5DEECE66D;
 const INCREMENT: i64 = 0xB;
 const MASK: i64 = (1 << 48) - 1;
 
+#[derive(Copy, Clone)]
 pub struct Random {
     seed: AtomicI64,
 }
+
 impl Random {
     /// Creates a new random number generator using a single [i64] seed.
     /// 

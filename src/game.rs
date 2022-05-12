@@ -1,8 +1,5 @@
 // The point of this file is to generate most of the game logic so it can be easily called via a functional interface.
-
-pub trait Game {
-
-}
+use crate::team::Team;
 
 pub struct Game {
     pub teamA: Team,

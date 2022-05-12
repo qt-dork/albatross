@@ -1,10 +1,12 @@
-use jandom;
+mod jandom;
+mod game;
+mod weather;
+mod team;
 
 fn main() {
     let mut rng = jandom::Random::new(0);
-
-    for _ in 0..10 {
-        println!("{}", rng.next_f64());
+    for i in 0..28 {
+        println!("{}", weather::Bird::BirdMessage(i, rng));
     }
     println!("Hello, world!");
 }
