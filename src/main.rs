@@ -3,12 +3,11 @@ mod game;
 mod weather;
 mod team;
 
+use team::Player::Player;
+
 fn main() {
-    let mut rng = jandom::Random::new(0);
-    for i in 0..28 {
-        println!("{}", weather::Bird::BirdMessage(i, rng));
-    }
-    println!("Hello, world!");
+    let player = Player::new();
+    println!("{}", player);
 }
 
 // Thought on structure

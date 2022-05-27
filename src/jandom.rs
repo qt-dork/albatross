@@ -11,7 +11,7 @@ const MULTIPLIER: i64 = 0x5DEECE66D;
 const INCREMENT: i64 = 0xB;
 const MASK: i64 = (1 << 48) - 1;
 
-#[derive(Copy, Clone)]
+// #[derive(Copy, Clone)]
 pub struct Random {
     seed: AtomicI64,
 }
