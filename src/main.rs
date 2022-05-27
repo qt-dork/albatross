@@ -7,7 +7,7 @@ use team::Player::Player;
 
 fn main() {
     let player = Player::new();
-    println!("{}", player);
+    println!("{:#?}", player);
 }
 
 // Thought on structure

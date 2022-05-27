@@ -50,7 +50,7 @@ pub mod Player {
       let mut rng = Random::new(0);
       let name = "Jerry".to_string();
       Player {
-        name,
+        name: name.clone(),
         batting: 0.0,
         pitching: 0.0,
         baserunning: 0.0,
@@ -77,16 +77,16 @@ pub mod Player {
         splash: 0.0,
         wisdom: 0.0,
   
-        ritual: PregameRitual::get_random_ritual(rng),
-        coffee: CoffeeStyle::get_random_coffee_style(rng),
-        blood_type: BloodType::get_random_blood_type(rng),
-        fate: Fate::get_random_fate(rng),
+        ritual: PregameRitual::get_random_ritual(&mut rng),
+        coffee: CoffeeStyle::get_random_coffee_style(&mut rng),
+        blood_type: BloodType::get_random_blood_type(&mut rng),
+        fate: Fate::get_random_fate(&mut rng),
         soulscream: Soulscream::generate_soulscream(name),
       }
     }
   }
 
-  #[derive(Debug)]
+  #[derive(Debug, Clone, Copy)]
   pub enum CoffeeStyle {
     Latte,
     ColdBrew,
@@ -148,13 +148,13 @@ pub mod Player {
       }
     }
   
-    pub fn get_random_coffee_style(&mut rng: Random) -> CoffeeStyle {
-      let x = rng.next_f64() * COFFEE_VARIANTS.len() as u64;
-      COFFEE_VARIANTS[x]
+    pub fn get_random_coffee_style(rng: &mut Random) -> CoffeeStyle {
+      let x = rng.next_f64() * COFFEE_VARIANTS.len() as f64;
+      COFFEE_VARIANTS[x as usize]
     }
   }
   
-  #[derive(Debug)]
+  #[derive(Debug, Clone, Copy)]
   pub enum BloodType {
     A,
     Aa,
@@ -222,9 +222,9 @@ pub mod Player {
       }
     }
   
-    pub fn get_random_blood_type(&mut rng: Random) -> BloodType {
-      let x = rng.next_f64() * BLOOD_TYPES.len() as u64;
-      BLOOD_TYPES[x]
+    pub fn get_random_blood_type(rng: &mut Random) -> BloodType {
+      let x = rng.next_f64() * BLOOD_TYPES.len() as f64;
+      BLOOD_TYPES[x as usize]
     }
   }
   
@@ -234,7 +234,7 @@ pub mod Player {
   pub struct Soulscream(pub String);
   impl Soulscream {
     pub fn generate_soulscream(name: String) -> Soulscream {
-      let seed = 1;
+      let mut seed = 1;
       let mut soulscream = String::new();
       for i in 0..name.len() {
         seed = seed * name.chars().nth(i).unwrap() as i64;
@@ -247,7 +247,7 @@ pub mod Player {
         soulscream.push(SOULSCREAM_CHARS.chars().nth(x as usize).unwrap());
       }
       loop {
-        y = y * 0.9;
+        let y = y * 0.9;
         for _ in 0..8 {
           let x = rng.next_f64() * SOULSCREAM_CHARS.len() as f64;
           soulscream.push(SOULSCREAM_CHARS.chars().nth(x as usize).unwrap());
@@ -616,11 +616,11 @@ pub mod Player {
   #[derive(Debug)]
   pub struct PregameRitual(String);
   impl PregameRitual {
-    fn get_random_ritual(&mut rng: Random) -> PregameRitual {
-      let x = rng.next_f64() * PREGAME_RITUALS.len() as u64;
-      let ritual = PREGAME_RITUALS[x];
+    fn get_random_ritual(rng: &mut Random) -> PregameRitual {
+      let x = rng.next_f64() * PREGAME_RITUALS.len() as f64;
+      let ritual = PREGAME_RITUALS[x as usize];
   
-      ritual
+      PregameRitual(ritual.to_string())
     }
     pub fn is_valid(&self) -> bool {
       let PregameRitual(ritual_string) = self;
@@ -632,9 +632,9 @@ pub mod Player {
   #[derive(Debug)]
   pub struct Fate(u8);
   impl Fate {
-    pub fn get_random_fate(&mut rng: Random) -> Fate {
-      let fate = rng.next_f64() * 100 as u8;
-      fate
+    pub fn get_random_fate(rng: &mut Random) -> Fate {
+      let fate = rng.next_f64() * 100.0;
+      Fate(fate as u8)
     }
     pub fn as_u8(&self) -> u8 {
       let Fate(value) = self;
