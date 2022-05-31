@@ -5,14 +5,8 @@ mod team;
 
 
 fn main() {
-    let mut rng = java_random::Random::new(0);
-    for _ in 0..50 {
-        println!("{}", rng.next_f64());
-    }
-    let mut new_rng = rng.clone();
-    for _ in 0..50 {
-        println!("{}", new_rng.next_f64());
-    }
+    let mut game = game::Game::new();
+    game.run();
 }
 
 // Thought on structure
