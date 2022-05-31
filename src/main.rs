@@ -5,8 +5,8 @@ mod team;
 
 
 fn main() {
-    let mut game = game::Game::new();
-    game.run();
+    let friend = team::Player::Player::new();
+    println!("{:?}", friend)
 }
 
 // Thought on structure

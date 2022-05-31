@@ -8,7 +8,9 @@ pub struct Team {
 }
 
 
-mod Player {
+pub mod Player {
+  use crate::java_random::Random;
+
   #[derive(Debug)]
   pub struct Player {
     name: String,
@@ -48,33 +50,56 @@ mod Player {
     pub fn new() -> Player {
       let mut rng = Random::new(0);
       let name = "Jerry".to_string();
+
+      let aggression = Player::random_unweighted_stat(&mut rng);
+      let anti_blasedness = Player::random_unweighted_stat(&mut rng);
+      let arrogance = Player::random_unweighted_stat(&mut rng);
+      let damage = Player::random_unweighted_stat(&mut rng);
+      let density = Player::random_unweighted_stat(&mut rng);
+      let dexterity = Player::random_unweighted_stat(&mut rng);
+      let dimensions = Player::random_unweighted_stat(&mut rng);
+      let effort = Player::random_unweighted_stat(&mut rng);
+      let focus = Player::random_unweighted_stat(&mut rng);
+      let fun = Player::random_unweighted_stat(&mut rng);
+      let grit = Player::random_unweighted_stat(&mut rng);
+      let hit_points = Player::random_unweighted_stat(&mut rng);
+      let malleability = Player::random_unweighted_stat(&mut rng);
+      let mathematics = Player::random_unweighted_stat(&mut rng);
+      let number_of_eyes = Player::random_unweighted_stat(&mut rng);
+      let pinpointedness = Player::random_unweighted_stat(&mut rng);
+      let powder = Player::random_unweighted_stat(&mut rng);
+      let rejection = Player::random_unweighted_stat(&mut rng);
+      let splash = Player::random_unweighted_stat(&mut rng);
+      let wisdom = Player::random_unweighted_stat(&mut rng);
+
       Player {
         name: name.clone(),
-        batting: 0.0,
-        pitching: 0.0,
-        baserunning: 0.0,
-        defense: 0.0,
 
-        aggression: 0.0,
-        anti_blasedness: 0.0,
-        arrogance: 0.0,
-        damage: 0.0,
-        density: 0.0,
-        dexterity: 0.0,
-        dimensions: 0.0,
-        effort: 0.0,
-        focus: 0.0,
-        fun: 0.0,
-        grit: 0.0,
-        hit_points: 0.0,
-        malleability: 0.0,
-        mathematics: 0.0,
-        number_of_eyes: 0.0,
-        pinpointedness: 0.0,
-        powder: 0.0,
-        rejection: 0.0,
-        splash: 0.0,
-        wisdom: 0.0,
+        aggression,
+        anti_blasedness,
+        arrogance,
+        damage,
+        density,
+        dexterity,
+        dimensions,
+        effort,
+        focus,
+        fun,
+        grit,
+        hit_points,
+        malleability,
+        mathematics,
+        number_of_eyes,
+        pinpointedness,
+        powder,
+        rejection,
+        splash,
+        wisdom,
+
+        batting: (density + number_of_eyes / 2.0 + focus / 4.0 + malleability / 8.0 + splash * 3.0 / 4.0 + aggression * 3.0 / 32.0) / 2.28125,
+        pitching: (pinpointedness + fun / 2.0 + grit / 4.0 + dimensions / 8.0 + powder * 3.0 / 16.0 ) / 2.1875,
+        baserunning: (hit_points + effort / 2.0 + arrogance / 20.0 + dexterity / 40.0) / 1.575,
+        defense: (mathematics + damage / 2.0 + anti_blasedness / 4.0 + rejection / 20.0 + wisdom / 40.0) / 1.825,
 
         ritual: PregameRitual::get_random_ritual(&mut rng),
         coffee: CoffeeStyle::get_random_coffee_style(&mut rng),
@@ -82,6 +107,14 @@ mod Player {
         fate: Fate::get_random_fate(&mut rng),
         soulscream: Soulscream::generate_soulscream(name),
       }
+    }
+
+    pub fn random_stat(rng: &mut Random) -> f64 {
+      rng.next_f64() * 2.5
+    }
+
+    pub fn random_unweighted_stat(rng: &mut Random) -> f64 {
+      rng.next_f64() * 5.0
     }
   }
 
