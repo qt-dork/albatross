@@ -1,7 +1,7 @@
 // The goal of this file is to generate the weather conditions for use in the game.rs file.
 // Temporarily we will be using
 
-use crate::jandom::Random;
+use crate::java_random::Random;
 //use std::fmt;
 
 pub enum WeatherOptions {
