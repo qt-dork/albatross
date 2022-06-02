@@ -1,5 +1,3 @@
-# albatross
+# albtrs - Alt League Blaseball To Rust (.rs)
 
-A port of Alt League Blaseball in rust with minor improvements for use in side projects
-
-A long name for albtrs (Alt League Blaseball To RuSt)
+Albatross is a port of TheMixedMaster's Alt League Blaseball to Rust, targeting WebAssembly, with minor improvements for use in related side projects.
