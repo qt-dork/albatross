@@ -2,10 +2,13 @@ mod java_random;
 mod game;
 mod weather;
 mod team;
+mod name_generator;
+mod markov_chain;
+mod player;
 
 
 fn main() {
-    let friend = team::Player::Player::new();
+    let friend = player::Player::new();
     println!("{:?}", friend)
 }
 
