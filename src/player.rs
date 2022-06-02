@@ -2,38 +2,34 @@ use crate::java_random::Random;
 
 #[derive(Debug)]
 pub struct Player {
-  name: String,
-  batting: f64,
-  pitching: f64,
-  baserunning: f64,
-  defense: f64,
+  pub name: String,
+  
+  pub aggression: f64,
+  pub anti_blasedness: f64,
+  pub arrogance: f64,
+  pub damage: f64,
+  pub density: f64,
+  pub dexterity: f64,
+  pub dimensions: f64,
+  pub effort: f64,
+  pub focus: f64,
+  pub fun: f64,
+  pub grit: f64,
+  pub hit_points: f64,
+  pub malleability: f64,
+  pub mathematics: f64,
+  pub number_of_eyes: f64,
+  pub pinpointedness: f64,
+  pub powder: f64,
+  pub rejection: f64,
+  pub splash: f64,
+  pub wisdom: f64,
 
-  aggression: f64,
-  anti_blasedness: f64,
-  arrogance: f64,
-  damage: f64,
-  density: f64,
-  dexterity: f64,
-  dimensions: f64,
-  effort: f64,
-  focus: f64,
-  fun: f64,
-  grit: f64,
-  hit_points: f64,
-  malleability: f64,
-  mathematics: f64,
-  number_of_eyes: f64,
-  pinpointedness: f64,
-  powder: f64,
-  rejection: f64,
-  splash: f64,
-  wisdom: f64,
-
-  ritual: PregameRitual,
-  coffee: CoffeeStyle,
-  blood_type: BloodType,
-  fate: Fate,
-  soulscream: Soulscream,
+  pub ritual: PregameRitual,
+  pub coffee: CoffeeStyle,
+  pub blood_type: BloodType,
+  pub fate: Fate,
+  pub soulscream: Soulscream,
 }
 impl Player {
   pub fn new() -> Player {
@@ -85,83 +81,11 @@ impl Player {
       splash,
       wisdom,
 
-      batting: (density + number_of_eyes / 2.0 + focus / 4.0 + malleability / 8.0 + splash * 3.0 / 4.0 + aggression * 3.0 / 32.0) / 2.28125,
-      pitching: (pinpointedness + fun / 2.0 + grit / 4.0 + dimensions / 8.0 + powder * 3.0 / 16.0 ) / 2.1875,
-      baserunning: (hit_points + effort / 2.0 + arrogance / 20.0 + dexterity / 40.0) / 1.575,
-      defense: (mathematics + damage / 2.0 + anti_blasedness / 4.0 + rejection / 20.0 + wisdom / 40.0) / 1.825,
-
       ritual: PregameRitual::get_random_ritual(&mut rng),
       coffee: CoffeeStyle::get_random_coffee_style(&mut rng),
       blood_type: BloodType::get_random_blood_type(&mut rng),
       fate: Fate::get_random_fate(&mut rng),
       soulscream: Soulscream::generate_soulscream(name),
-    }
-  }
-
-  pub fn from(name: String,
-              batting: f64,
-              pitching: f64,
-              baserunning: f64,
-              defense: f64,
-              aggression: f64,
-              anti_blasedness: f64,
-              arrogance: f64,
-              damage: f64,
-              density: f64,
-              dexterity: f64,
-              dimensions: f64,
-              effort: f64,
-              focus: f64,
-              fun: f64,
-              grit: f64,
-              hit_points: f64,
-              malleability: f64,
-              mathematics: f64,
-              number_of_eyes: f64,
-              pinpointedness: f64,
-              powder: f64,
-              rejection: f64,
-              splash: f64,
-              wisdom: f64,
-              ritual: PregameRitual,
-              coffee: CoffeeStyle,
-              blood_type: BloodType,
-              fate: Fate,
-              soulscream: Soulscream) -> Player {
-    Player {
-      name,
-
-      batting,
-      pitching,
-      baserunning,
-      defense,
-
-      aggression,
-      anti_blasedness,
-      arrogance,
-      damage,
-      density,
-      dexterity,
-      dimensions,
-      effort,
-      focus,
-      fun,
-      grit,
-      hit_points,
-      malleability,
-      mathematics,
-      number_of_eyes,
-      pinpointedness,
-      powder,
-      rejection,
-      splash,
-      wisdom,
-
-      ritual,
-      coffee,
-      blood_type,
-      fate,
-      soulscream,
     }
   }
 
@@ -171,6 +95,22 @@ impl Player {
 
   pub fn random_unweighted_stat(rng: &mut Random) -> f64 {
     rng.next_f64() * 5.0
+  }
+
+  pub fn get_batting(&self) -> f64 {
+    (self.density + self.number_of_eyes / 2.0 + self.focus / 4.0 + self.malleability / 8.0 + self.splash * 3.0 / 4.0 + self.aggression * 3.0 / 32.0) / 2.28125
+  }
+
+  pub fn get_pitching(&self) -> f64 {
+    (self.pinpointedness + self.fun / 2.0 + self.grit / 4.0 + self.dimensions / 8.0 + self.powder * 3.0 / 16.0 ) / 2.1875
+  }
+
+  pub fn get_baserunning(&self) -> f64 {
+    (self.hit_points + self.effort / 2.0 + self.arrogance / 20.0 + self.dexterity / 40.0) / 1.575
+  }
+
+  pub fn get_defense(&self) -> f64 {
+    (self.mathematics + self.damage / 2.0 + self.anti_blasedness / 4.0 + self.rejection / 20.0 + self.wisdom / 40.0) / 1.825
   }
 }
 
