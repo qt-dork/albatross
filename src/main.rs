@@ -8,8 +8,20 @@ mod player;
 
 
 fn main() {
-    let friend = player::Player::new();
-    println!("{:?}", friend)
+    let mut game = game::Game::new(
+        team::Team::empty(),
+        team::Team::empty(),
+        1,
+        5
+    );
+
+    for _ in 0..10 {
+        let logs = game.next_pitch();
+
+        for log in logs.get_logs() {
+            println!("{}", log);
+        }
+    }
 }
 
 // Thought on structure

@@ -1,6 +1,6 @@
 use crate::java_random::Random;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Player {
   pub name: String,
   
@@ -95,6 +95,10 @@ impl Player {
 
   pub fn random_unweighted_stat(rng: &mut Random) -> f64 {
     rng.next_f64() * 5.0
+  }
+
+  pub fn get_name(&self) -> String {
+    self.name.clone()
   }
 
   pub fn get_batting(&self) -> f64 {
@@ -258,7 +262,7 @@ impl BloodType {
 
 const SOULSCREAM_CHARS: &'static str = "AEIOUHX";
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Soulscream(pub String);
 impl Soulscream {
   pub fn generate_soulscream(name: String) -> Soulscream {
@@ -641,7 +645,7 @@ const PREGAME_RITUALS: [&'static str; 343] = [
   "Picking flowers",
   "Side jobs"
 ];
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PregameRitual(String);
 impl PregameRitual {
   fn get_random_ritual(rng: &mut Random) -> PregameRitual {
@@ -657,7 +661,7 @@ impl PregameRitual {
   }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Fate(u8);
 impl Fate {
   pub fn get_random_fate(rng: &mut Random) -> Fate {
