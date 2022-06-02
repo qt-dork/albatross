@@ -98,6 +98,73 @@ impl Player {
     }
   }
 
+  pub fn from(name: String,
+              batting: f64,
+              pitching: f64,
+              baserunning: f64,
+              defense: f64,
+              aggression: f64,
+              anti_blasedness: f64,
+              arrogance: f64,
+              damage: f64,
+              density: f64,
+              dexterity: f64,
+              dimensions: f64,
+              effort: f64,
+              focus: f64,
+              fun: f64,
+              grit: f64,
+              hit_points: f64,
+              malleability: f64,
+              mathematics: f64,
+              number_of_eyes: f64,
+              pinpointedness: f64,
+              powder: f64,
+              rejection: f64,
+              splash: f64,
+              wisdom: f64,
+              ritual: PregameRitual,
+              coffee: CoffeeStyle,
+              blood_type: BloodType,
+              fate: Fate,
+              soulscream: Soulscream) -> Player {
+    Player {
+      name,
+
+      batting,
+      pitching,
+      baserunning,
+      defense,
+
+      aggression,
+      anti_blasedness,
+      arrogance,
+      damage,
+      density,
+      dexterity,
+      dimensions,
+      effort,
+      focus,
+      fun,
+      grit,
+      hit_points,
+      malleability,
+      mathematics,
+      number_of_eyes,
+      pinpointedness,
+      powder,
+      rejection,
+      splash,
+      wisdom,
+
+      ritual,
+      coffee,
+      blood_type,
+      fate,
+      soulscream,
+    }
+  }
+
   pub fn random_stat(rng: &mut Random) -> f64 {
     rng.next_f64() * 2.5
   }
