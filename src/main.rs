@@ -5,13 +5,14 @@ mod team;
 mod name_generator;
 mod markov_chain;
 mod player;
+mod stats;
 
 
 fn main() {
     let mut game = game::Game::new(
         team::Team::empty(),
         team::Team::empty(),
-        1,
+        2,
         5
     );
 
