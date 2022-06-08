@@ -32,9 +32,8 @@ pub struct Player {
   pub soulscream: Soulscream,
 }
 impl Player {
-  pub fn new() -> Player {
+  pub fn new(name: String) -> Player {
     let mut rng = Random::new(0);
-    let name = "Jerry".to_string();
 
     let aggression = Player::random_unweighted_stat(&mut rng);
     let anti_blasedness = Player::random_unweighted_stat(&mut rng);
@@ -115,6 +114,12 @@ impl Player {
 
   pub fn get_defense(&self) -> f64 {
     (self.mathematics + self.damage / 2.0 + self.anti_blasedness / 4.0 + self.rejection / 20.0 + self.wisdom / 40.0) / 1.825
+  }
+}
+
+impl Default for Player {
+  fn default() -> Player {
+    Player::new("Default".to_string())
   }
 }
 

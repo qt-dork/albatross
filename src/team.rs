@@ -52,7 +52,7 @@ impl Team {
   pub fn generate_new_players(length: usize) -> Vec<Player> {
     let mut players: Vec<Player> = Vec::new();
     for i in 0..length {
-      players.push(Player::new());
+      players.push(Player::default());
     }
     players
   }
