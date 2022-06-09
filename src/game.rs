@@ -1,11 +1,13 @@
 use std::fmt;
 
+use std::time::{Duration, SystemTime};
+
 // The point of this file is to generate most of the game logic so it can be easily called via a functional interface.
 use crate::team::Team;
 use crate::player::Player;
 use crate::java_random::Random;
 
-const TICK: usize = 100;
+const TICK: u64 = 100;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum TopOfInning {
@@ -20,8 +22,8 @@ pub struct Game {
     pub pitchers: EitherOr<Player>,
 
     pub day: usize,
-    pub start_time: usize,
-    pub current_time: usize,
+    pub start_time: u64, // NOTE: I feel like this could be collapsed into a single field? Like a start_time current_time struct.
+    pub current_time: u64,
     pub game_log: Vec<GameLog>,
     // pub weather: Weather, // TODO: implement weather
 
@@ -32,18 +34,18 @@ pub struct Game {
     pub defender: Player,
 
     pub scores: (f64, f64),
-    pub wins: (u32, u32),
-    pub balls: u32,
-    pub strikes: u32,
-    pub outs: u32,
-    pub active_team_bat: u32,
-    pub inactive_team_bat: u32,
+    pub wins: (i32, i32),
+    pub balls: i32,
+    pub strikes: i32,
+    pub outs: i32,
+    pub active_team_bat: u32, // Maybe this should be EitherOr?
+    pub inactive_team_bat: u32, // Wait no it can't. It's a u32.
 
     pub bases: Vec<Player>,
 }
 
 impl Game {
-    pub fn new(home: Team, away: Team, day: usize, start_time: usize) -> Self {
+    pub fn new(home: Team, away: Team, day: usize, start_time: u64) -> Self {
         let seed: i64 = (day + 4 + home.get_favor() as usize + away.get_favor() as usize) as i64; // Changes in update. TODO: fix this
         Game {
             rng: Random::new(seed),
@@ -93,11 +95,18 @@ impl Game {
 
         self.update("Blay pall!".to_string(), TICK);
 
+        let sys_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
+        
+        let cur_time = sys_time.as_secs();
+
         while !self.is_game_over() {
             self.do_inning();
         }
 
         let message = format!("{} {}, {} {}", self.teams.home().get_name(), self.wins.0, self.teams.away().get_name(), self.wins.1);
+        self.update(message, TICK);
+        self.update("\nGame Over.".to_string(), TICK);
+        self.give_wins();
     }
 
     // Placeholder
@@ -112,8 +121,36 @@ impl Game {
         self.update(message, TICK);
 
         while !self.is_inning_over() {
-            
+            self.clear_bases();
+            self.set_next_batter();
+            while !self.has_struck_out() {
+                self.do_steals();
+                self.do_pitch();
+            }
+            self.strikes = 0;
+            self.balls = 0;
+            self.outs += 1;
+            self.update(format!("[Out {}]", self.outs), 0);
         }
+
+        // Do end of inning stuff
+        self.outs = 0;
+        match self.top {
+            TopOfInning::Top => self.top = TopOfInning::Bottom,
+            TopOfInning::Bottom => {
+                self.top = TopOfInning::Top;
+                self.update(format!("Inning {} is now an Outing."), TICK);
+                self.print_score(); // NOTE: I don't like this
+
+                self.inning += 1;
+            },
+        }
+
+        // Switch sides
+        self.teams.switch_sides();
+        self.pitchers.switch_sides();
+
+        // Switch out teams' batting positions
     }
 
     // NOTE: This feels off idk. Figure out a better way to do this
@@ -135,8 +172,8 @@ impl Game {
     //     logs
     // }
 
-    pub fn update(&mut self, log: String, time: usize) {
-        let current_time = self.current_time;
+    pub fn update(&mut self, log: String, time: u64) {
+        let current_time = self.current_time; // See if there's a better way to handle current time?
         self.game_log.push(GameLog {
             log,
             time: current_time,
@@ -144,21 +181,69 @@ impl Game {
         self.current_time += time;
     }
 
-    pub fn score_as_string(score: f64) -> String {
-        let message = String::new();
-        if score % 1.0 == 0.0 {
-            message.push_str(&format!("{}", score as u32));
-        } else {
-            message.push_str(&format!("{:.1}", score));
+    pub fn get_game_name(&self) -> String {
+        format!(
+            "{}, {} vs. {}, Day {}", 
+            self.teams.home().get_name(), // TODO: Make this the current weather once that is implemented
+            self.teams.away().get_name(),
+            self.teams.home().get_name(), 
+            self.day
+        )
+    }
+
+    // Precondition: simulate_game() has been called already
+    pub fn is_live(&self) -> bool {
+        self.current_time == self.start_time
+    }
+
+    pub fn get_random_defender(&mut self) -> Player {
+        let players = self.teams.pitching().get_active_batters();
+        let random_number = (self.rng.next_f64() * players.len() as f64) as usize;
+
+        players[random_number]
+    }
+
+    /// Returns true if the batter has struck out.
+    /// 
+    /// NOTE: This will need to be updated to be variable
+    /// in the future if features like the fourth base are
+    /// added
+    pub fn has_struck_out(&self) -> bool {
+        self.strikes >= 3
+    }
+
+    pub fn format_balls_strikes(&self) -> String {
+        let b = self.balls.to_string();
+        let s = self.strikes.to_string();
+
+        if self.balls < 0 {
+            b = format!("(-{})", self.balls.abs());
         }
-        if score < 0.0 {
-            message = format!("({})", message);
+        if self.strikes < 0 {
+            s = format!("(-{})", self.strikes.abs());
         }
-        message
+        return format!("{}-{}", b, s);
+    }
+
+    pub fn clear_bases(&mut self) {
+        self.bases.clear();
     }
 }
 
 
+// Game function but not part of game struct
+pub fn score_as_string(score: f64) -> String {
+    let message = String::new();
+    if score % 1.0 == 0.0 {
+        message.push_str(&format!("{}", score as u32));
+    } else {
+        message.push_str(&format!("{:.1}", score));
+    }
+    if score < 0.0 {
+        message = format!("({})", message);
+    }
+    message
+}
 
 
 // This is all data structures stuff. Please ignore.
@@ -166,11 +251,11 @@ impl Game {
 #[derive(Debug, Clone)]
 pub struct GameLog {
     pub log: String,
-    pub time: usize,
+    pub time: u64,
 }
 
 impl GameLog {
-    pub fn new(log: String, time: usize) -> Self {
+    pub fn new(log: String, time: u64) -> Self {
         GameLog {
             log,
             time,
@@ -264,7 +349,7 @@ impl<T:Clone> EitherOr<T> {
         self.items.1 = item;
     }
 
-    pub fn switch(&mut self) {
+    pub fn switch_sides(&mut self) {
         self.batting = match self.batting {
             BattingPitching::Batting => BattingPitching::Pitching,
             BattingPitching::Pitching => BattingPitching::Batting,
