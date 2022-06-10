@@ -6,10 +6,10 @@ use crate::player::Player;
 
 #[derive(Debug, Clone)]
 pub struct Team {
-  name: String,
-  location: String,
-  logo: String,
-  abbreviation: String,
+  pub name: String,
+  pub location: String,
+  pub logo: String,
+  pub abbreviation: String,
 
   lineup: Vec<Player>,
   rotation: Vec<Player>,

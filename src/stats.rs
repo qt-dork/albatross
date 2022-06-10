@@ -24,7 +24,7 @@ impl CharacterStat {
   }
 
   pub fn value(&mut self) -> f64 {
-    if (self.is_dirty) {
+    if self.is_dirty {
       self._value = self.calculate_final_value();
       self.is_dirty = false;
     }

@@ -12,17 +12,12 @@ fn main() {
     let mut game = game::Game::new(
         team::Team::empty(),
         team::Team::empty(),
-        2,
+        1,
         5
     );
 
-    for _ in 0..10 {
-        let logs = game.next_pitch();
-
-        for log in logs.get_logs() {
-            println!("{}", log);
-        }
-    }
+    game.simulate_game();
+    game.play_logs();
 }
 
 // Thought on structure

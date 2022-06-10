@@ -5,8 +5,8 @@ pub struct Player {
   pub name: String,
   
   pub aggression: f64,
-  pub anti_blasedness: f64,
   pub arrogance: f64,
+  pub carcinization: f64,
   pub damage: f64,
   pub density: f64,
   pub dexterity: f64,
@@ -36,8 +36,8 @@ impl Player {
     let mut rng = Random::new(0);
 
     let aggression = Player::random_unweighted_stat(&mut rng);
-    let anti_blasedness = Player::random_unweighted_stat(&mut rng);
     let arrogance = Player::random_unweighted_stat(&mut rng);
+    let carcinization = Player::random_unweighted_stat(&mut rng);
     let damage = Player::random_unweighted_stat(&mut rng);
     let density = Player::random_unweighted_stat(&mut rng);
     let dexterity = Player::random_unweighted_stat(&mut rng);
@@ -60,8 +60,8 @@ impl Player {
       name: name.clone(),
 
       aggression,
-      anti_blasedness,
       arrogance,
+      carcinization,
       damage,
       density,
       dexterity,
@@ -113,7 +113,7 @@ impl Player {
   }
 
   pub fn get_defense(&self) -> f64 {
-    (self.mathematics + self.damage / 2.0 + self.anti_blasedness / 4.0 + self.rejection / 20.0 + self.wisdom / 40.0) / 1.825
+    (self.mathematics + self.damage / 2.0 + self.carcinization / 4.0 + self.rejection / 20.0 + self.wisdom / 40.0) / 1.825
   }
 }
 
