@@ -25,15 +25,15 @@ pub struct Team {
 impl Team {
   /// Creates a new team with the given name, location, logo, abbreviation, and lineup.
   /// Generates a random lineup, and a random rotation.
-  pub fn new(name: String, location: String, logo: String, favor: u32, abbreviation: String) -> Self {
+  pub fn new(rng: &mut Random, name: String, location: String, logo: String, favor: u32, abbreviation: String) -> Self {
     Team {
       name,
       location,
       logo,
       abbreviation,
 
-      lineup: Team::generate_new_players(9),
-      rotation: Team::generate_new_players(5),
+      lineup: Team::generate_new_players(rng, 9),
+      rotation: Team::generate_new_players(rng, 5),
 
       non_losses: 0,
       wins: 0,
@@ -45,14 +45,14 @@ impl Team {
   }
 
   /// Creates an empty team with the name "team", location "null", and other blank data.
-  pub fn empty() -> Self {
-    Team::new("team".to_string(), "null".to_string(), "❓".to_string(), 0, "NULL".to_string())
+  pub fn empty(rng: &mut Random) -> Self {
+    Team::new(rng, "team".to_string(), "null".to_string(), "❓".to_string(), 0, "NULL".to_string())
   }
 
-  pub fn generate_new_players(length: usize) -> Vec<Player> {
+  pub fn generate_new_players(rng: &mut Random, length: usize) -> Vec<Player> {
     let mut players: Vec<Player> = Vec::new();
     for i in 0..length {
-      players.push(Player::default());
+      players.push(Player::default(rng));
     }
     players
   }

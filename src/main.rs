@@ -5,17 +5,24 @@ mod team;
 mod name_generator;
 mod markov_chain;
 mod player;
-mod stats;
+mod player_stats;
+mod messaging;
+mod player_flavor;
 
+use std::time::{Duration, SystemTime};
+
+
+use java_random::Random;
 
 fn main() {
-    let mut game = game::Game::new(
-        team::Team::empty(),
-        team::Team::empty(),
-        1,
-        5
-    );
+    let mut rng = Random::new(-4);
 
+    let mut game = game::Game::new(
+        team::Team::empty(&mut rng),
+        team::Team::empty(&mut rng),
+        4,
+        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis(),
+    );
     game.simulate_game();
     game.play_logs();
 }

@@ -1,3 +1,4 @@
 /target
 /alb
 .vscode/*
+.DS_Store
