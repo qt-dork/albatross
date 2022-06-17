@@ -24,4 +24,6 @@ impl League {
       games: Games::empty(),
     }
   }
+
+  pub fn find_by_name
 }
