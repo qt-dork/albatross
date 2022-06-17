@@ -10,6 +10,7 @@ pub type BallsStrikes = (i32, i32);
 // Copy doesn't work here because we store player names instead of ids to players, whose names are retrieved from the database.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Message {
+    // Game event messages
     AnnounceMatchup(String, String), // Team 1, Team 2
     StartGame,
     InningStart(bool, u32, String, String), // Top, Inning, Team1, Team2
@@ -34,6 +35,9 @@ pub enum Message {
     InningToOuting(u32), // Inning
     EndGameScore(String, f64, String, f64), // Team1Name, Team1Score, Team2Name, Team2Score
     GameOver,
+
+    // Weather specific messages
+    Crabs,
 }
 
 impl Message {
@@ -163,6 +167,10 @@ impl Message {
             Message::GameOver => {
                 "\nGame over.".to_string()
             }
+
+            Message::Crabs => {
+                "Crabs fill the field.".to_string()
+            }
         }
     }
 
@@ -201,6 +209,7 @@ impl Message {
 pub struct MessageLog {
     pub messages: VecDeque<Message>,
     pub time: VecDeque<u128>,
+    pub is_special: VecDeque<bool>,
 }
 
 impl MessageLog {
@@ -208,11 +217,12 @@ impl MessageLog {
         MessageLog {
             messages: VecDeque::new(),
             time: VecDeque::new(),
+            is_special: VecDeque::new(),
         }
     }
 
     pub fn len(&self) -> Option<usize> {
-        if self.messages.len() != self.time.len() {
+        if self.messages.len() != self.time.len() && self.messages.len() != self.is_special.len() {
             None
         } else {
             Some(self.messages.len())
@@ -225,18 +235,23 @@ impl MessageLog {
         })
     }
 
-    pub fn peek(&self) -> Option<&Message> {
-        self.messages.front()
+    pub fn peek(&self) -> Option<(&Message, &u128, &bool)> {
+        let message = self.messages.front()?;
+        let time = self.time.front()?;
+        let is_special = self.is_special.front()?;
+        Some((message, time, is_special))
     }
 
-    pub fn log(&mut self, message: Message, time: u128) {
+    pub fn log(&mut self, message: Message, time: u128, is_special: bool) {
         self.messages.push_back(message);
         self.time.push_back(time);
+        self.is_special.push_back(is_special);
     }
 
     pub fn clear(&mut self) {
         self.messages.clear();
         self.time.clear();
+        self.is_special.clear();
     }
 }
 

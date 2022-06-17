@@ -9,6 +9,7 @@ use crate::java_random::Random;
 
 const TICK: u128 = 0;
 
+#[derive(Debug, Clone)]
 pub struct Game {
     pub rng: Random,
 
@@ -197,7 +198,7 @@ impl Game {
     pub fn simulate_game(&mut self) {
         self.start_game();
 
-        self.update(Message::StartGame, TICK);
+        self.log(Message::StartGame);
 
         let sys_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
         
@@ -207,14 +208,14 @@ impl Game {
             self.do_inning();
         }
 
-        self.update(Message::EndGameScore(self.home.get_name(), self.scores.0, self.away.get_name(), self.scores.1), TICK);
-        self.update(Message::GameOver, TICK);
+        self.log(Message::EndGameScore(self.home.get_name(), self.scores.0, self.away.get_name(), self.scores.1));
+        self.log(Message::GameOver);
         self.give_wins();
     }
 
     // Placeholder
     pub fn do_inning(&mut self) {
-        self.update(Message::InningStart(self.top, self.inning, self.teams_batting().get_name(), self.teams_pitching().get_name()), TICK);
+        self.log(Message::InningStart(self.top, self.inning, self.teams_batting().get_name(), self.teams_pitching().get_name()));
 
         while !self.is_inning_over() {
             self.clear_bases();
@@ -226,7 +227,7 @@ impl Game {
             self.strikes = 0;
             self.balls = 0;
             self.outs += 1;
-            self.update(Message::Out(self.outs), 0);
+            self.log_with_time(Message::Out(self.outs), 0);
         }
 
         // Do end of inning stuff
@@ -235,7 +236,7 @@ impl Game {
             true => self.top = false,
             false => {
                 self.top = true;
-                self.update(Message::InningToOuting(self.inning), TICK);
+                self.log(Message::InningToOuting(self.inning));
                 self.print_score(); // NOTE: I don't like this
 
                 self.inning += 1;
@@ -261,11 +262,22 @@ impl Game {
     //     self.rng = rng;
     //     logs
     // }
+    
+    /// Appends a `Message` log to the `MessageLog` struct. It uses the default `TICK` value for the time and assumes that the message isn't special.
+    pub fn log(&mut self, log: Message) {
+        self.log_full_event(log, TICK, false);
+    }
 
-    fn update(&mut self, log: Message, time: u128) {
+    /// Works the same as the `log()` function, but takes a time value as well. Assumes that the message isn't special.
+    pub fn log_with_time(&mut self, log: Message, time: u128) {
+        self.log_full_event(log, time, false)
+    }
+
+    /// Takes all values in the `MessageLog` struct and appends them in.
+    pub fn log_full_event(&mut self, log: Message, time: u128, is_special: bool) {
         // Unused since Duration can sleep for x amount of time (which is a cursed solution but I'll find a better one later)
         let current_time = self.current_time; // See if there's a better way to handle current time?
-        self.message_log.log(log, time);
+        self.message_log.log(log, time, is_special);
         self.current_time += time;
     }
 
@@ -283,9 +295,9 @@ impl Game {
             if bat_value <= pitch_value {
                 self.strikes += 1;
                 if self.has_struck_out() {
-                    self.update(Message::StruckOutLooking(self.batter.get_name(), (self.balls, self.strikes)), TICK);
+                    self.log(Message::StruckOutLooking(self.batter.get_name(), (self.balls, self.strikes)));
                 } else {
-                    self.update(Message::StrikeLooking((self.balls, self.strikes)), TICK);
+                    self.log(Message::StrikeLooking((self.balls, self.strikes)));
                 }
             } else {
                 let pitch_value = self.rng.next_f64() * 10.0 + self.pitchers_pitching().dimensions.value();
@@ -293,9 +305,9 @@ impl Game {
                 if bat_value <= pitch_value {
                     self.strikes += 1;
                     if self.has_struck_out() {
-                        self.update(Message::StruckOutSwinging(self.batter.get_name(), (self.balls, self.strikes)), TICK);
+                        self.log(Message::StruckOutSwinging(self.batter.get_name(), (self.balls, self.strikes)));
                     } else {
-                        self.update(Message::StrikeSwinging((self.balls, self.strikes)), TICK);
+                        self.log(Message::StrikeSwinging((self.balls, self.strikes)));
                     }
                 }
             }
@@ -307,7 +319,7 @@ impl Game {
                     while self.has_struck_out() {
                         self.strikes -= 1;
                     }
-                    self.update(Message::FoulBall((self.balls, self.strikes)), TICK);
+                    self.log(Message::FoulBall((self.balls, self.strikes)));
                 }
             } else {
                 let defender = self.get_random_defender();
@@ -316,13 +328,13 @@ impl Game {
                 if bat_value <= defense_value {
                     // What the fuck?
                     self.strikes += 100;
-                    self.update(Message::Flyout(self.batter.get_name(), self.defender.get_name()),TICK)
+                    self.log(Message::Flyout(self.batter.get_name(), self.defender.get_name()))
                 } else {
                     let bat_value = self.rng.next_f64() * 10.0 + self.batter.hit_points.value();
                     let defense_value = self.rng.next_f64() * 10.0 + defender.damage.value();
                     if bat_value <= defense_value {
                         self.strikes += 100;
-                        self.update(Message::Groundout(self.batter.get_name(), self.defender.get_name()), TICK);
+                        self.log(Message::Groundout(self.batter.get_name(), self.defender.get_name()));
                     } else {
                         let mut bases_run = 0;
                         loop {
@@ -333,7 +345,7 @@ impl Game {
                                 break;
                             }
                         }
-                        self.update(Message::Hit(self.batter.get_name(), bases_run), TICK);
+                        self.log(Message::Hit(self.batter.get_name(), bases_run));
                         self.advance_baserunners(bases_run);
                         self.set_next_batter();
                     }
@@ -344,7 +356,7 @@ impl Game {
 
     // God this function sucks so much shit I need to break
     // this up into separate rolls for the sake of my sanity
-    fn steal_attempt(&mut self, base_num: usize) {
+    pub fn steal_attempt(&mut self, base_num: usize) {
         let defender = self.get_random_defender();
 
         // You should not be accessing these values inside
@@ -360,7 +372,7 @@ impl Game {
         if steal_value > defense_value {
             // The last part of the message will be
             // by the position of the base stolen
-            self.update(Message::Steal(self.bases[base_num as usize].clone().unwrap().get_name(), base_num), TICK);
+            self.log(Message::Steal(self.bases[base_num as usize].clone().unwrap().get_name(), base_num));
 
             // Holy shit why is this passing in an entire
             // Player to a score function
@@ -377,7 +389,7 @@ impl Game {
         // It occurred to me just now that this is all a 
         // nested if statement.
         } else {
-            self.update(Message::CaughtStealing(self.bases[base_num].clone().unwrap().get_name(), base_num), TICK);
+            self.log(Message::CaughtStealing(self.bases[base_num].clone().unwrap().get_name(), base_num));
 
             // What the fuck? Why is this 100?
             self.strikes += 100;
@@ -433,13 +445,22 @@ impl Game {
         }
     }
 
+    pub fn are_bases_empty(&self) -> bool {
+        for base in self.bases.iter() {
+            if base.is_some() {
+                return false;
+            }
+        }
+        true
+    }
+
     fn score(&mut self, p: &Player) {
         if self.top {
             self.scores.0 += 1.0;
         } else {
             self.scores.1 += 1.0;
         }
-        self.update(Message::Scores(p.get_name()), 0);
+        self.log_with_time(Message::Scores(p.get_name()), 0);
     }
 
     // Unused code
@@ -466,7 +487,7 @@ impl Game {
         self.current_time >= SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() && self.start_time <= SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis()
     }
 
-    pub fn get_random_defender(&mut self) -> Player {
+    fn get_random_defender(&mut self) -> Player {
         let players = self.teams_pitching().get_active_batters();
         let random_number = (self.rng.next_f64() * players.len() as f64) as usize;
 
@@ -478,12 +499,12 @@ impl Game {
     /// NOTE: This will need to be updated to be variable
     /// in the future if features like fourth strike are
     /// added
-    pub fn has_struck_out(&self) -> bool {
+    fn has_struck_out(&self) -> bool {
         self.strikes >= 3
     }
 
     // Idk how to add this to the game log :/
-    pub fn format_balls_strikes(&self) -> String {
+    fn format_balls_strikes(&self) -> String {
         let mut b = self.balls.to_string();
         let mut s = self.strikes.to_string();
 
@@ -496,26 +517,26 @@ impl Game {
         return format!("{}-{}", b, s);
     }
 
-    pub fn clear_bases(&mut self) {
+    fn clear_bases(&mut self) {
         self.bases = vec![None, None, None];
     }
 
-    pub fn ball(&mut self) {
+    fn ball(&mut self) {
         self.balls += 1;
         if self.balls >= 4 {
             // For some reason in the original code, the
             // Player class has a get_name() function but
             // it's never used. Mixed just grabs the name
             // from the variables.
-            self.update(Message::Walk(self.batter.get_name()), TICK);
+            self.log(Message::Walk(self.batter.get_name()));
             self.walk();
             self.set_next_batter();
         } else {
-            self.update(Message::Ball((self.balls, self.strikes)), TICK)
+            self.log(Message::Ball((self.balls, self.strikes)))
         }
     }
 
-    pub fn walk(&mut self) {
+    fn walk(&mut self) {
         let mut scored = false;
         // This feels like the borrow checker will hate it
         let mut moving = self.batter.clone();
@@ -545,7 +566,7 @@ impl Game {
     }
 
     fn print_score(&mut self) {
-        self.update(Message::CurrentScore(self.home.abbreviation.clone(), self.scores.0, self.scores.1, self.away.abbreviation.clone()), 0);
+        self.log_with_time(Message::CurrentScore(self.home.abbreviation.clone(), self.scores.0, self.scores.1, self.away.abbreviation.clone()), 0);
     }
 
     /// Retrieves the teams from the Game struct. The use
@@ -589,7 +610,7 @@ impl Game {
         let batting_team = self.teams_batting().get_active_batters();
         self.batter = batting_team[(self.bat_batting() - 1) % batting_team.len()].clone();
 
-        self.update(Message::NextBatter(self.batter.get_name(), self.teams_batting().get_name()), TICK);
+        self.log(Message::NextBatter(self.batter.get_name(), self.teams_batting().get_name()));
     }
 
     pub fn play_logs(&mut self) {

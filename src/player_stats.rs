@@ -41,6 +41,8 @@ impl CharacterStat {
   }
 
 
+  // I think i can do something with fold here idk
+  // Also move this to value
   fn calculate_final_value(&self) -> f64 {
     let mut final_value = self.base_value;
     for modifier in &self.stat_modifiers {
