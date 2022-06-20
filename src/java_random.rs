@@ -135,7 +135,9 @@ impl Random {
         (high.wrapping_add(low) as f64) / F64_DIV
     }
 
-
+    pub fn get_seed(&self) -> i64 {
+        self.state.0
+    }
 }
 
 // This is testing stuff

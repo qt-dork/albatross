@@ -1,27 +1,18 @@
-mod java_random;
-mod game;
-mod weather;
-mod team;
-mod name_generator;
-mod markov_chain;
-mod player;
+use std::time::{Duration, SystemTime};
 
+use java_random::Random;
 
 fn main() {
+    let mut rng = Random::new(-4);
+
     let mut game = game::Game::new(
-        team::Team::empty(),
-        team::Team::empty(),
-        1,
-        5
+        team::Team::empty(&mut rng),
+        team::Team::empty(&mut rng),
+        4,
+        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis(),
     );
-
-    for _ in 0..10 {
-        let logs = game.next_pitch();
-
-        for log in logs.get_logs() {
-            println!("{}", log);
-        }
-    }
+    game.simulate_game();
+    game.play_logs();
 }
 
 // Thought on structure
