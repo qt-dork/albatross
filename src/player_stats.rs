@@ -1,15 +1,15 @@
 use std::{ops::Add};
 
 
-#[derive(Debug, Clone)]
-pub struct CharacterStat {
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct PlayerStat {
   pub base_value: f64,
   stat_modifiers: Vec<StatModifier>,
 }
 
-impl CharacterStat {
+impl PlayerStat {
   pub fn new(base_value: f64) -> Self {
-    CharacterStat {
+    PlayerStat {
       base_value,
       stat_modifiers: Vec::new(),
     }
@@ -64,13 +64,13 @@ impl CharacterStat {
 }
 
 // TODO: Implement other impls for CharacterStat, like Sub, Mul, etc.
-impl Add for CharacterStat {
+impl Add for PlayerStat {
   type Output = Self;
   fn add(self, other: Self) -> Self {
     let base_value = self.base_value + other.base_value;
     let stat_modifiers = self.get_stat_modifiers().into_iter().chain(other.get_stat_modifiers().into_iter()).collect();
 
-    CharacterStat {
+    PlayerStat {
       base_value,
       stat_modifiers,
     }

@@ -1,19 +1,10 @@
 // The goal of this file is to generate the weather conditions for use in the game.rs file.
-// Temporarily we will be using
-
-use crate::java_random::Random;
-use crate::game::Game;
-use crate::messaging::Message;
-use crate::player::Player;
 //use std::fmt;
 
+#[derive(Clone, Debug, PartialEq)]
 pub enum Weather {
-    Clear(Random),
-    Crabs(Random),
-    Meownsoon(Random), // Oh my god it's back
-    PulsarPulsar(Random),
-    SolarEclipse(Random),
-    SnailMail(Random),
+    Clear,
+    SolarEclipse,
 }
 
 impl Weather {
@@ -21,118 +12,16 @@ impl Weather {
 
     pub fn name(&self) -> &'static str {
         match self {
-            Weather::Clear(_) => "Clear",
-            Weather::Crabs(_) => "Crabs",
-            Weather::Meownsoon(_) => "Meownsoon",
-            Weather::PulsarPulsar(_) => "Pulsar(Pulsar)",
-            Weather::SolarEclipse(_) => "Solar Eclipse",
-            Weather::SnailMail(_) => "Snail Mail",
+            Weather::Clear => "Clear",
+            Weather::SolarEclipse => "Solar Eclipse",
         }
     }
 
     pub fn description(&self) -> &'static str {
         match self {
             // Placeholders for weather descriptions
-            Weather::Clear(_) => "It's a beautiful day.",
-            Weather::Crabs(_) => "It's a beautiful day.",
-            Weather::Meownsoon(_) => "It's a beautiful day.",
-            Weather::PulsarPulsar(_) => "It's a beautiful day.",
-            Weather::SolarEclipse(_) => "It's a beautiful day.",
-            Weather::SnailMail(_) => "It's a beautiful day.",
-        }
-    }
-
-    pub fn start_of_game(&self, game: &mut Game) {
-        match self {
-            Weather::Clear => {},
-            Weather::Crabs(_) => {},
-            Weather::Meownsoon => {},
-            Weather::PulsarPulsar => {},
-            Weather::SolarEclipse(_) => {},
-            Weather::SnailMail => {},
-        }
-    }
-
-    pub fn before_pitch(&mut self, game: &mut Game) {
-        match self {
-            Weather::Clear => {},
-            Weather::Crabs(_) => {},
-            Weather::Meownsoon => {},
-            Weather::PulsarPulsar => {},
-            Weather::SolarEclipse(rng) => {
-                if rng.next_f64() > 0.00003 {
-                    return;
-                }
-                let rand;
-                if game.are_bases_empty() {
-                    rand = (rng.next_f64() * 3.) as usize;
-                } else {
-                    rand = (rng.next_f64() * 4.) as usize;
-                }
-                let p;
-                // add statistic
-                match rand {
-                    0 => {
-                        // i've put myself into this hell
-                        let pitcher = game.pitchers_pitching().clone();
-                        for p in game.pitchers_mut() {
-                            if p == &pitcher {
-                                pitcher = Player::default(rng);
-                            }
-                        }
-
-                    }
-                }
-            },
-            Weather::SnailMail => {},
-        }
-    }
-
-    pub fn before_full_inning(&self, game: &mut Game) {
-        match self {
-            Weather::Clear => {},
-            Weather::Crabs(_) => {
-                game.log(Message::Crabs);
-            },
-            Weather::Meownsoon => {},
-            Weather::PulsarPulsar => {},
-            Weather::SnailMail => {},
-        }
-    }
-
-    pub fn before_half_inning(&self, game: &mut Game) {
-        match self {
-            Weather::Clear => {},
-            Weather::Crabs(_) => {},
-            Weather::Meownsoon => {},
-            Weather::PulsarPulsar => {},
-            Weather::SnailMail => {},
-        }
-    }
-
-    pub fn after_ball(&self, game: &mut Game) {
-        match self {
-            Weather::Clear => {},
-            Weather::Crabs(_) => {
-                for i in (0..game.bases.len()).rev() {
-                    if game.bases[i].is_some() {
-                        game.steal_attempt(i);
-                    }
-                }
-            },
-            Weather::Meownsoon => {},
-            Weather::PulsarPulsar => {},
-            Weather::SnailMail => {},
-        }
-    }
-
-    pub fn end_of_game(&self, game: &mut Game) {
-        match self {
-            Weather::Clear => {},
-            Weather::Crabs => {},
-            Weather::Meownsoon => {},
-            Weather::PulsarPulsar => {},
-            Weather::SnailMail => {},
+            Weather::Clear => "",
+            Weather::SolarEclipse => "It's a beautiful day.",
         }
     }
 }
