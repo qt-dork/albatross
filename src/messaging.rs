@@ -4,6 +4,8 @@
 
 use std::collections::VecDeque;
 
+use crate::{comp::{TeamId, PlayerId}, league::League};
+
 pub type BallsStrikes = (i32, i32);
 
 // Also derives Copy, Deserialize, and Serialize
@@ -11,40 +13,62 @@ pub type BallsStrikes = (i32, i32);
 #[derive(Debug, Clone, PartialEq)]
 pub enum Message {
     // Game event messages
-    AnnounceMatchup(String, String), // Team 1, Team 2
+    /// Team 1, Team 2
+    AnnounceMatchup(TeamId, TeamId),
     StartGame,
-    InningStart(bool, u32, String, String), // Top, Inning, Team1, Team2
-    CurrentScore(String, f64, f64, String), // Team1Abbr, Team1Score, Team2Score, Team2Abbr
-    Steal(String, usize), // Stealer Name, Base Stolen
-    CaughtStealing(String, usize), // Stealer Name, Base Stolen
-    Walk(String), // Batter Name
-    Ball(BallsStrikes), // BallsStrikes
-    StruckOutLooking(String, BallsStrikes), // Batter Name, Balls Strikes
-    StrikeLooking(BallsStrikes), // Balls Strikes
-    StruckOutSwinging(String, BallsStrikes), // Batter Name, Balls Strikes
-    StrikeSwinging(BallsStrikes), // Balls Strikes
-    FoulBall(BallsStrikes), // Balls Strikes
-    Flyout(String, String), // Batter Name, Defender Name
-    Groundout(String, String), // Batter Name, Defender Name
+    /// Top, Inning, Team1, Team 2
+    InningStart(bool, u32, TeamId, TeamId),
+    /// Team1Abbr, Team1Score, Team2Score, Team2Abbr
+    CurrentScore(TeamId, f64, f64, TeamId),
+    /// Stealer Name, Base Stolen
+    Steal(PlayerId, usize),
+    /// Stealer Name, Base Stolen
+    CaughtStealing(PlayerId, usize),
+    /// Batter Name
+    Walk(PlayerId), 
+    /// BallsStrikes
+    Ball(BallsStrikes),
+    /// Batter Name, Balls Strikes
+    StruckOutLooking(PlayerId, BallsStrikes),
+    /// Balls Strikes
+    StrikeLooking(BallsStrikes),
+    /// Batter Name, Balls Strikes
+    StruckOutSwinging(PlayerId, BallsStrikes),
+    /// Balls Strikes
+    StrikeSwinging(BallsStrikes), 
+    /// Balls Strikes
+    FoulBall(BallsStrikes), 
+    /// Batter Name, Defender Name
+    Flyout(PlayerId, PlayerId), 
+    /// Batter Name, Defender Name
+    Groundout(PlayerId, PlayerId), 
     // NOTE: Maybe I should have Bases Hit be its own enum?
-    Scores(String), // Batter Name
-    Hit(String, usize), // Batter Name, Bases Hit
+    /// Batter Name
+    Scores(PlayerId), 
+    /// Batter Name, Bases Hit
+    Hit(PlayerId, usize), 
     // Figure something out for the format_balls_strikes() function
-    NextBatter(String, String), // Batter Name, Team Name
-    Out(i32), // Number of outs
-    InningToOuting(u32), // Inning
-    EndGameScore(String, f64, String, f64), // Team1Name, Team1Score, Team2Name, Team2Score
+    /// Batter Name, Team Name
+    NextBatter(PlayerId, TeamId), 
+    /// Number of outs
+    Out(i32),
+    /// Inning
+    InningToOuting(u32),
+    /// Team1Name, Team1Score, Team2Name, Team2Score
+    EndGameScore(TeamId, f64, TeamId, f64), 
     GameOver,
 
     // Weather specific messages
-    Crabs,
 }
 
 impl Message {
-    pub fn message_line(&self) -> String {
+    pub fn message_line(&self, league: &League) -> String {
         match self {
             Message::AnnounceMatchup(team1, team2) => {
-                format!("{} vs. {}", team1, team2)
+                format!("{} vs. {}",
+                    league.teams.name[team1].clone(),
+                    league.teams.name[team2].clone()
+                )
             },
             Message::StartGame => {
                 "Blay pall!".to_string()
@@ -52,68 +76,87 @@ impl Message {
             Message::InningStart(top, inning, team1, team2) => {
                 match top {
                     true => {
-                        format!("Top of {}, {} batting. {} pitching.", inning, team1, team2)
+                        format!("Top of {}, {} batting. {} pitching.", 
+                            inning,
+                            league.teams.name[team1].clone(),
+                            league.teams.name[team2].clone()
+                        )
                     },
                     false => {
-                        format!("Bottom of {}, {} batting. {}pitching.", inning, team1, team2)
+                        format!("Bottom of {}, {} batting. {}pitching.",
+                            inning,
+                            league.teams.name[team1].clone(),
+                            league.teams.name[team2].clone()
+                        )
                     }
                 }
             },
             Message::CurrentScore(team1, score1, score2, team2) => {
-                format!("[Current score is {} {}-{} {}]", team1, Self::score_as_string(score1), Self::score_as_string(score2), team2)
+                format!("[Current score is {} {}-{} {}]", 
+                    league.teams.abbreviation[team1].clone(),
+                    Self::score_as_string(score1),
+                    Self::score_as_string(score2),
+                    league.teams.abbreviation[team2].clone()
+                )
             },
             Message::Steal(stealer, base) => {
-                let stolen_base: String;
-                match base {
+                let stolen_base = match base {
                     0 => {
-                        stolen_base = "second base".to_string();
+                        "second base"
                     },
                     1 => {
-                        stolen_base = "third base".to_string();
+                        "third base"
                     },
                     2 => {
-                        stolen_base = "home".to_string();
+                        "home"
                     },
                     _ => {
                         // Fourth base isn't out yet
                         panic!("Invalid base number: {}", base);
                     }
-                }
-                format!("{} steals {}!", stealer, stolen_base)
+                };
+                format!("{} steals {}!",
+                    league.players.name[stealer].clone(),
+                    stolen_base
+                )
             },
             Message::CaughtStealing(stealer, base) => {
-                let stolen_base: String;
-                match base {
+                let stolen_base =match base {
                     0 => {
-                        stolen_base = "second base".to_string();
+                        "second base"
                     },
                     1 => {
-                        stolen_base = "third base".to_string();
+                        "third base"
                     },
                     2 => {
-                        stolen_base = "home".to_string();
+                        "home"
                     },
                     _ => {
                         // Fourth base isn't out yet
                         panic!("Invalid base number: {}", base);
                     }
-                }
-                format!("{} gets caught stealing {}.", stealer, stolen_base)
+                };
+                format!("{} gets caught stealing {}.",
+                    league.players.name[stealer].clone(),
+                    stolen_base
+                )
             },
             Message::Walk(batter) => {
-                format!("{} draws a walk.", batter)
+                format!("{} draws a walk.", league.players.name[batter].clone())
             },
             Message::Ball((balls, strikes)) => {
                 format!("Ball. {}-{}", balls, strikes)
             },
             Message::StruckOutLooking(batter, balls_strikes) => {
-                format!("{} strikes out looking. ", batter) + &Self::format_balls_strikes(balls_strikes)
+                format!("{} strikes out looking. ",
+                    league.players.name[batter].clone()
+                ) + &Self::format_balls_strikes(balls_strikes)
             },
             Message::StrikeLooking(balls_strikes) => {
                 "Strike, looking. ".to_owned() + &Self::format_balls_strikes(balls_strikes)
             },
             Message::StruckOutSwinging(batter, balls_strikes) => {
-                format!("{} strikes out swinging. ", batter) + &Self::format_balls_strikes(balls_strikes)
+                format!("{} strikes out swinging. ", league.players.name[batter].clone()) + &Self::format_balls_strikes(balls_strikes)
             },
             Message::StrikeSwinging(balls_strikes) => {
                 "Strike, swinging. ".to_owned() +  &Self::format_balls_strikes(balls_strikes)
@@ -122,36 +165,47 @@ impl Message {
                 "Foul ball. ".to_owned() + &Self::format_balls_strikes(balls_strikes)
             },
             Message::Flyout(batter, defender) => {
-                format!("{} hit a flyout to {}.", batter, defender)
+                format!("{} hit a flyout to {}.", 
+                    league.players.name[batter].clone(),
+                    league.players.name[defender].clone()
+                )
             },
             Message::Groundout(batter, defender) => {
-                format!("{} hit a ground out to {}!", batter, defender)
+                format!("{} hit a ground out to {}!", 
+                    league.players.name[batter].clone(),
+                    league.players.name[defender].clone()
+                )
             },
             Message::Scores(batter) => {
-                format!("{} scores!", batter)
+                format!("{} scores!", league.players.name[batter].clone())
             },
             Message::Hit(batter, bases_hit) => {
                 // let mut message = format!("{} his a ", batter);
-                let base: String;
-                match bases_hit {
+                let base = match bases_hit {
                     1 => {
-                        base = "Single".to_string();
+                        "Single"
                     },
                     2 => {
-                        base = "Double".to_string();
+                        "Double"
                     },
                     3 => {
-                        base = "Triple".to_string();
+                        "Triple"
                     },
                     // Eventually this might need to support the fourth base, if that's ever added
                     _ => {
-                        base = "Home Run".to_string();
+                        "Home Run"
                     }
-                }
-                format!("{} hits a {}!", batter, base)
+                };
+                format!("{} hits a {}!",
+                    league.players.name[batter].clone(),
+                    base
+                )
             },
             Message::NextBatter(batter, team) => {
-                format!("{} batting for the {}.", batter, team)
+                format!("{} batting for the {}.", 
+                    league.players.name[batter].clone(),
+                    league.teams.name[team].clone()
+                )
             },
             Message::Out(outs) => {
                 format!("[Out {}]", outs)
@@ -161,15 +215,16 @@ impl Message {
             },
             //DoneFix
             Message::EndGameScore(team1, wins1, team2, wins2) => {
-                format!("{} {}, {} {}", team1, Self::score_as_string(wins1), Self::score_as_string(wins2), team2)
+                format!("{} {}, {} {}",
+                    league.teams.name[team1].clone(),
+                    Self::score_as_string(wins1), 
+                    Self::score_as_string(wins2),
+                    league.teams.name[team2].clone()
+                )
             },
 
             Message::GameOver => {
                 "\nGame over.".to_string()
-            }
-
-            Message::Crabs => {
-                "Crabs fill the field.".to_string()
             }
         }
     }
@@ -205,7 +260,7 @@ impl Message {
 }
 
 // Also includes Serialize and Deserialize in the original
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct MessageLog {
     pub messages: VecDeque<Message>,
     pub time: VecDeque<u128>,
@@ -214,11 +269,7 @@ pub struct MessageLog {
 
 impl MessageLog {
     pub fn new() -> Self {
-        MessageLog {
-            messages: VecDeque::new(),
-            time: VecDeque::new(),
-            is_special: VecDeque::new(),
-        }
+        Default::default()
     }
 
     pub fn len(&self) -> Option<usize> {
@@ -254,4 +305,3 @@ impl MessageLog {
         self.is_special.clear();
     }
 }
-

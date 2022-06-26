@@ -1,18 +1,12 @@
 use std::time::{Duration, SystemTime};
 
-use java_random::Random;
+use alt_league_blaseball::league::League;
 
 fn main() {
-    let mut rng = Random::new(-4);
-
-    let mut game = game::Game::new(
-        team::Team::empty(&mut rng),
-        team::Team::empty(&mut rng),
-        4,
-        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis(),
-    );
-    game.simulate_game();
-    game.play_logs();
+    let mut league = League::default();
+    league.initialize_teams();
+    
+    println!("{:#?}", league);
 }
 
 // Thought on structure

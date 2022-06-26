@@ -20,7 +20,18 @@ impl PlayerStat {
   }
 
   pub fn value(&self) -> f64 {
-    self.calculate_final_value()
+    let mut final_value = self.base_value;
+    for modifier in &self.stat_modifiers {
+      match modifier.stat_modifier_type {
+        StatModifierType::Flat => {
+          final_value += modifier.value;
+        }
+        StatModifierType::Percent => {
+          final_value *= 1.0 + modifier.value;
+        }
+      }
+    }
+    final_value
   }
 
   pub fn add_modifier(&mut self, modifier: StatModifier) {
@@ -38,24 +49,6 @@ impl PlayerStat {
   
   pub fn clear(&mut self) {
     self.stat_modifiers.clear();
-  }
-
-
-  // I think i can do something with fold here idk
-  // Also move this to value
-  fn calculate_final_value(&self) -> f64 {
-    let mut final_value = self.base_value;
-    for modifier in &self.stat_modifiers {
-      match modifier.stat_modifier_type {
-        StatModifierType::Flat => {
-          final_value += modifier.value;
-        }
-        StatModifierType::Percent => {
-          final_value *= 1.0 + modifier.value;
-        }
-      }
-    }
-    final_value
   }
 
   pub fn base_value(&self) -> f64 {
@@ -84,7 +77,7 @@ pub enum StatModifierType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StatModifierLongetivity {
+pub enum StatModifierLongevity {
   Permanent,
   Temporary,
 }
@@ -93,31 +86,31 @@ pub enum StatModifierLongetivity {
 pub struct StatModifier {
   value: f64,
   stat_modifier_type: StatModifierType,
-  stat_modifier_longetivity: StatModifierLongetivity,
+  stat_modifier_longevity: StatModifierLongevity,
   order: i32,
 }
 
 impl StatModifier {
-  pub fn new(value: f64, stat_modifier_type: StatModifierType, stat_modifier_longetivity: StatModifierLongetivity, order: i32) -> Self {
+  pub fn new(value: f64, stat_modifier_type: StatModifierType, stat_modifier_longevity: StatModifierLongevity, order: i32) -> Self {
     StatModifier {
       value,
       stat_modifier_type,
-      stat_modifier_longetivity,
+      stat_modifier_longevity,
       order,
     }
   }
 
-  pub fn new_without_order(value: f64, stat_modifier_type: StatModifierType, stat_modifier_longetivity: StatModifierLongetivity) -> Self {
+  pub fn new_without_order(value: f64, stat_modifier_type: StatModifierType, stat_modifier_longevity: StatModifierLongevity) -> Self {
     let order = stat_modifier_type.clone() as i32;
-    StatModifier::new(value, stat_modifier_type, stat_modifier_longetivity, order)
+    StatModifier::new(value, stat_modifier_type, stat_modifier_longevity, order)
   }
 
-  pub fn new_without_longetivity(value: f64, stat_modifier_type: StatModifierType) -> Self {
-    StatModifier::new_without_order(value, stat_modifier_type, StatModifierLongetivity::Temporary)
+  pub fn new_without_longevity(value: f64, stat_modifier_type: StatModifierType) -> Self {
+    StatModifier::new_without_order(value, stat_modifier_type, StatModifierLongevity::Temporary)
   }
 
   pub fn is_temporary(&self) -> bool {
-    self.stat_modifier_longetivity == StatModifierLongetivity::Temporary
+    self.stat_modifier_longevity == StatModifierLongevity::Temporary
   }
 
   pub fn get_value(&self) -> f64 {
@@ -128,8 +121,8 @@ impl StatModifier {
     self.stat_modifier_type.clone()
   }
 
-  pub fn get_longetivity(&mut self) -> StatModifierLongetivity {
-    self.stat_modifier_longetivity.clone()
+  pub fn get_longevity(&mut self) -> StatModifierLongevity {
+    self.stat_modifier_longevity.clone()
   }
 
   pub fn get_order(&mut self) -> i32 {
@@ -143,7 +136,7 @@ impl Default for StatModifier {
     StatModifier {
       value: 0.0,
       stat_modifier_type: StatModifierType::Flat,
-      stat_modifier_longetivity: StatModifierLongetivity::Temporary,
+      stat_modifier_longevity: StatModifierLongevity::Temporary,
       order,
     }
   }

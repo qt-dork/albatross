@@ -1,4 +1,5 @@
 use crate::comp::*;
+use crate::types::{Division, Position};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Teams {
@@ -38,7 +39,7 @@ impl Teams {
         logo: &str,
         abbreviation: &str,
         division: Division,
-    ) {
+    ) -> TeamId {
         let id = self.next_id;
         self.next_id += 1;
         self.id.push(id);
@@ -54,6 +55,28 @@ impl Teams {
         self.losses.insert(id, 0);
 
         self.favor.insert(id, id.try_into().unwrap());
+
+        id
+    }
+
+    /// Gets the PlayerId of every player on both the lineup and rotation.
+    pub fn active_roster(&self, team: TeamId) -> Vec<PlayerId> {
+        let mut roster = self.lineup.get(&team).unwrap().clone();
+        roster.extend_from_slice(&self.rotation.get(&team).unwrap());
+        roster
+    }
+
+    /// Checks which team a player is on. Returns the team that player is on, and the position they're in. Otherwise returns None.
+    pub fn contains(&self, player_id: PlayerId) -> Option<(Position, TeamId)> {
+        for team in self.id.iter() {
+            if self.lineup.get(team).unwrap().contains(&player_id) {
+                return Some((Position::Lineup, *team));
+            }
+            if self.rotation.get(team).unwrap().contains(&player_id) {
+                return Some((Position::Rotation, *team));
+            }
+        }
+        None
     }
 }
 
@@ -77,69 +100,6 @@ impl Default for Teams {
             wins: Comp::new(),
             losses: Comp::new(),
             favor: Comp::new(),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Division {
-    UltraDark,
-    ModerateDark,
-    UltraLight,
-    ModerateLight,
-}
-
-impl Division {
-    pub fn flip_league(&self) -> Division {
-        match self {
-            Division::UltraDark => Division::ModerateDark,
-            Division::ModerateDark => Division::UltraDark,
-            Division::UltraLight => Division::ModerateDark,
-            Division::ModerateLight => Division::UltraLight,
-        }
-    }
-    pub fn flip_division(&self) -> Division {
-        match self {
-            Division::UltraDark => Division::UltraLight,
-            Division::ModerateDark => Division::ModerateLight,
-            Division::UltraLight => Division::UltraDark,
-            Division::ModerateLight => Division::ModerateDark,
-        }
-    }
-
-    pub fn is_dark(&self) -> bool {
-        match self {
-            Division::UltraDark => true,
-            Division::ModerateDark => true,
-            Division::UltraLight => false,
-            Division::ModerateLight => false,
-        }
-    }
-
-    pub fn is_light(&self) -> bool {
-        match self {
-            Division::UltraDark => false,
-            Division::ModerateDark => false,
-            Division::UltraLight => true,
-            Division::ModerateLight => true,
-        }
-    }
-
-    pub fn is_ultra(&self) -> bool {
-        match self {
-            Division::UltraDark => true,
-            Division::ModerateDark => false,
-            Division::UltraLight => true,
-            Division::ModerateLight => false,
-        }
-    }
-
-    pub fn is_moderate(&self) -> bool {
-        match self {
-            Division::UltraDark => false,
-            Division::ModerateDark => true,
-            Division::UltraLight => false,
-            Division::ModerateLight => true,
         }
     }
 }

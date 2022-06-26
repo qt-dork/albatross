@@ -1,48 +1,69 @@
 use crate::comp::*;
-use crate::player_flavor::PregameRitual;
-use crate::player_stats::*;
+use crate::java_random::Random;
+use crate::mixed_name_gen::MixedNameGenerator;
+use crate::player_stat::*;
+use crate::attributes::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Players {
     pub id: Vec<PlayerId>,
+    next_id: PlayerId,
     
     pub name: Comp<String>,
     pub team: Comp<TeamId>,
     pub original_team: Comp<TeamId>,
 
-    pub aggression: Comp<PlayerStat>,
-    pub arrogance: Comp<PlayerStat>,
-    pub carcinization: Comp<PlayerStat>,
-    pub damage: Comp<PlayerStat>,
-    pub density: Comp<PlayerStat>,
-    pub dexterity: Comp<PlayerStat>,
-    pub dimensions: Comp<PlayerStat>,
-    pub effort: Comp<PlayerStat>,
-    pub focus: Comp<PlayerStat>,
-    pub fun: Comp<PlayerStat>,
-    pub grit: Comp<PlayerStat>,
-    pub hit_points: Comp<PlayerStat>,
-    pub malleability: Comp<PlayerStat>,
-    pub mathematics: Comp<PlayerStat>,
-    pub number_of_eyes: Comp<PlayerStat>,
-    pub pinpointedness: Comp<PlayerStat>,
-    pub powder: Comp<PlayerStat>,
-    pub rejection: Comp<PlayerStat>,
-    pub splash: Comp<PlayerStat>,
-    pub wisdom: Comp<PlayerStat>,
+    pub attributes: Comp<Attributes>,
 
-    pub pregame_ritual: Comp<PregameRitual>,
-    pub coffee_style: Comp<CoffeeStyle>,
-    pub blood_type: Comp<BloodType>,
-    pub fate: Comp<Fate>,
-    pub soulscream: Comp<Soulscream>,
+    pub deceased: Comp<bool>,
 
-    pub statistics: Comp<Statistics>,
-    pub modifications: Comp<Modifications>,
+    // pub pregame_ritual: Comp<PregameRitual>,
+    // pub coffee_style: Comp<CoffeeStyle>,
+    // pub blood_type: Comp<BloodType>,
+    // pub fate: Comp<Fate>,
+    // pub soulscream: Comp<Soulscream>,
+
+    // pub statistics: Comp<Statistics>,
+    // pub modifications: Comp<Modifications>,
 }
 
 impl Players {
-    pub fn is_dead() -> bool {
-        // TODO
+    pub fn create_player(&mut self, rng: &mut Random, team_id: TeamId) -> PlayerId {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.id.push(id);
+
+        let mut gen = MixedNameGenerator::new(rng.seed());
+        let range = gen.random(1, 5) + gen.random(1, 5);
+        let name = gen.next_name_with_distribution() + " " + &gen.distribution_with_length(range);
+        rng.set_seed(gen.seed());
+
+        // insert stuff
+        self.name.insert(id, name);
+        self.team.insert(id, team_id);
+        self.original_team.insert(id, team_id);
+        self.attributes.insert(id, Attributes::random(rng));
+        self.deceased.insert(id, false);
+
+        id
+    }
+
+    pub fn is_dead(&self, id: PlayerId) -> bool {
+        self.deceased[&id]
+    }
+}
+
+impl Default for Players {
+    fn default() -> Self {
+        Players { 
+            id: Vec::new(),
+            next_id: 0,
+            
+            name: Comp::default(),
+            team: Comp::default(),
+            original_team: Comp::default(),
+            attributes: Comp::default(),
+            deceased: Comp::default(),
+        }
     }
 }

@@ -6,11 +6,11 @@ version = 3
 name = "alt_league_blaseball"
 version = "0.1.0"
 dependencies = [
- "anymap",
+ "uuid",
 ]
 
 [[package]]
-name = "anymap"
-version = "0.12.1"
+name = "uuid"
+version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33954243bd79057c2de7338850b85983a44588021f8a5fee574a8888c6de4344"
+checksum = "dd6469f4314d5f1ffec476e05f17cc9a78bc7a27a6a857842170bdf8d6f98d2f"
