@@ -98,7 +98,7 @@ pub enum Statistic {
     // Groundouts Hit (GHL) Batter stat
     // GroundoutsHit, // Idk if this can be implemented
     // Base Steal Attempts (BSA) Batter stat
-    // BaseStealAttempts,
+    BaseStealAttempts,
     // Second Base Stolen (SBS) Batter stat
     // SecondBaseStolen,
     // Caught Stealing Second Base (CSBS) Batter stat
@@ -184,6 +184,7 @@ impl Statistic {
             Statistic::TotalBases => "TB",
             Statistic::DoublePlaysGroundedInto => "GIDP",
             Statistic::Sacrifices => "SAC",
+            Statistic::BaseStealAttempts => "BSA",
         }
     }
 
@@ -231,6 +232,7 @@ impl Statistic {
             Statistic::TotalBases => "Total Bases",
             Statistic::DoublePlaysGroundedInto => "Double Plays Grounded Into",
             Statistic::Sacrifices => "Sacrifices",
+            Statistic::BaseStealAttempts => "Base Steal Attempts",
         }
     }
 }
@@ -279,6 +281,7 @@ pub struct Statistics {
     pub total_bases: u32,
     pub double_plays_grounded_into: u32,
     pub sacrifices: u32,
+    pub base_steal_attempts: u32,
 }
 
 impl Statistics {
@@ -326,6 +329,7 @@ impl Statistics {
             total_bases: 0,
             double_plays_grounded_into: 0,
             sacrifices: 0,
+            base_steal_attempts: 0,
         }
     }
 
@@ -388,6 +392,7 @@ impl Statistics {
                 self.double_plays_grounded_into += amount as u32
             }
             Statistic::Sacrifices => self.sacrifices += amount as u32,
+            Statistic::BaseStealAttempts => self.base_steal_attempts += amount as u32,
         }
     }
 

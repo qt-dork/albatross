@@ -83,6 +83,13 @@ pub enum PitchOutcome {
     Hit(u8)
 }
 
+pub enum StealOutcome {
+    /// The player has successfully stolen the base
+    Steal,
+    /// The player was caught stealing
+    CaughtStealing,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum GameKind {
     /// This game affects regular season standings

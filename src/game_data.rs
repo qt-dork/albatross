@@ -148,6 +148,6 @@ impl GameDatum {
             self.away_score += 1;
             self.away_has_scored = true;
         }
-        self.log.log(Message::Scores(player), time, is_special)
+        // self.log.log(Message::Scores(player), time, is_special)
     }
 }

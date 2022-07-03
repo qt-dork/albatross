@@ -1,12 +1,15 @@
 use std::time::{Duration, SystemTime};
 
-use alt_league_blaseball::league::League;
+use alt_league_blaseball::{league::League, messaging::Message};
 
 fn main() {
     let mut league = League::default();
     league.initialize_teams();
     
-    println!("{:#?}", league);
+    let log = Message::Hit(1, 1);
+    println!("{}", log.message_line(&league));
+    let log = Message::NextBatter(1, 1);
+    println!("{}", log.message_line(&league));
 }
 
 // Thought on structure

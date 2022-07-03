@@ -1,15 +1,14 @@
 // The goal of this file is to generate the weather conditions for use in the game.rs file.
 //use std::fmt;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub enum Weather {
+    #[default]
     Clear,
     SolarEclipse,
 }
 
 impl Weather {
-    // Figure out some sort of set_seed function to make it easier to generate random numbers.
-
     pub fn name(&self) -> &'static str {
         match self {
             Weather::Clear => "Clear",
@@ -23,12 +22,6 @@ impl Weather {
             Weather::Clear => "",
             Weather::SolarEclipse => "It's a beautiful day.",
         }
-    }
-}
-
-impl Default for Weather {
-    fn default() -> Self {
-        Weather::Clear
     }
 }
 

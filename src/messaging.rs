@@ -65,7 +65,7 @@ impl Message {
     pub fn message_line(&self, league: &League) -> String {
         match self {
             Message::AnnounceMatchup(team1, team2) => {
-                format!("{} vs. {}",
+                format!("{:?} vs. {:?}",
                     league.teams.name[team1].clone(),
                     league.teams.name[team2].clone()
                 )
@@ -76,14 +76,14 @@ impl Message {
             Message::InningStart(top, inning, team1, team2) => {
                 match top {
                     true => {
-                        format!("Top of {}, {} batting. {} pitching.", 
+                        format!("Top of {}, {:?} batting. {:?} pitching.", 
                             inning,
                             league.teams.name[team1].clone(),
                             league.teams.name[team2].clone()
                         )
                     },
                     false => {
-                        format!("Bottom of {}, {} batting. {}pitching.",
+                        format!("Bottom of {}, {:?} batting. {:?} pitching.",
                             inning,
                             league.teams.name[team1].clone(),
                             league.teams.name[team2].clone()
@@ -92,7 +92,7 @@ impl Message {
                 }
             },
             Message::CurrentScore(team1, score1, score2, team2) => {
-                format!("[Current score is {} {}-{} {}]", 
+                format!("[Current score is {:?} {:?}-{:?} {:?}]", 
                     league.teams.abbreviation[team1].clone(),
                     Self::score_as_string(score1),
                     Self::score_as_string(score2),
@@ -115,7 +115,7 @@ impl Message {
                         panic!("Invalid base number: {}", base);
                     }
                 };
-                format!("{} steals {}!",
+                format!("{:?} steals {:?}!",
                     league.players.name[stealer].clone(),
                     stolen_base
                 )
@@ -136,19 +136,19 @@ impl Message {
                         panic!("Invalid base number: {}", base);
                     }
                 };
-                format!("{} gets caught stealing {}.",
+                format!("{:?} gets caught stealing {:?}.",
                     league.players.name[stealer].clone(),
                     stolen_base
                 )
             },
             Message::Walk(batter) => {
-                format!("{} draws a walk.", league.players.name[batter].clone())
+                format!("{:?} draws a walk.", league.players.name[batter].clone())
             },
             Message::Ball((balls, strikes)) => {
                 format!("Ball. {}-{}", balls, strikes)
             },
             Message::StruckOutLooking(batter, balls_strikes) => {
-                format!("{} strikes out looking. ",
+                format!("{:?} strikes out looking. ",
                     league.players.name[batter].clone()
                 ) + &Self::format_balls_strikes(balls_strikes)
             },
@@ -156,7 +156,7 @@ impl Message {
                 "Strike, looking. ".to_owned() + &Self::format_balls_strikes(balls_strikes)
             },
             Message::StruckOutSwinging(batter, balls_strikes) => {
-                format!("{} strikes out swinging. ", league.players.name[batter].clone()) + &Self::format_balls_strikes(balls_strikes)
+                format!("{:?} strikes out swinging. ", league.players.name[batter].clone()) + &Self::format_balls_strikes(balls_strikes)
             },
             Message::StrikeSwinging(balls_strikes) => {
                 "Strike, swinging. ".to_owned() +  &Self::format_balls_strikes(balls_strikes)
@@ -165,22 +165,22 @@ impl Message {
                 "Foul ball. ".to_owned() + &Self::format_balls_strikes(balls_strikes)
             },
             Message::Flyout(batter, defender) => {
-                format!("{} hit a flyout to {}.", 
+                format!("{:?} hit a flyout to {:?}.", 
                     league.players.name[batter].clone(),
                     league.players.name[defender].clone()
                 )
             },
             Message::Groundout(batter, defender) => {
-                format!("{} hit a ground out to {}!", 
+                format!("{:?} hit a ground out to {:?}!", 
                     league.players.name[batter].clone(),
                     league.players.name[defender].clone()
                 )
             },
             Message::Scores(batter) => {
-                format!("{} scores!", league.players.name[batter].clone())
+                format!("{:?} scores!", league.players.name[batter].clone())
             },
             Message::Hit(batter, bases_hit) => {
-                // let mut message = format!("{} his a ", batter);
+                // let mut message = format!("{:?} his a ", batter);
                 let base = match bases_hit {
                     1 => {
                         "Single"
@@ -196,13 +196,13 @@ impl Message {
                         "Home Run"
                     }
                 };
-                format!("{} hits a {}!",
+                format!("{:?} hits a {:?}!",
                     league.players.name[batter].clone(),
                     base
                 )
             },
             Message::NextBatter(batter, team) => {
-                format!("{} batting for the {}.", 
+                format!("{:?} batting for the {:?}.", 
                     league.players.name[batter].clone(),
                     league.teams.name[team].clone()
                 )
@@ -215,11 +215,11 @@ impl Message {
             },
             //DoneFix
             Message::EndGameScore(team1, wins1, team2, wins2) => {
-                format!("{} {}, {} {}",
-                    league.teams.name[team1].clone(),
+                format!("{:?} {:?}, {:?} {:?}",
+                    league.teams.name[team1],
                     Self::score_as_string(wins1), 
                     Self::score_as_string(wins2),
-                    league.teams.name[team2].clone()
+                    league.teams.name[team2]
                 )
             },
 
@@ -242,7 +242,7 @@ impl Message {
         } else {
             s = format!("{}", strikes);
         }
-        format!("{}-{}", b, s)
+        format!("{:?}-{:?}", b, s)
     }
 
     fn score_as_string(score: &f64) -> String {

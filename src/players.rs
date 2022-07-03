@@ -3,6 +3,7 @@ use crate::java_random::Random;
 use crate::mixed_name_gen::MixedNameGenerator;
 use crate::player_stat::*;
 use crate::attributes::*;
+use crate::statistics::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Players {
@@ -23,7 +24,7 @@ pub struct Players {
     // pub fate: Comp<Fate>,
     // pub soulscream: Comp<Soulscream>,
 
-    // pub statistics: Comp<Statistics>,
+    pub statistics: Comp<Statistics>,
     // pub modifications: Comp<Modifications>,
 }
 
@@ -64,6 +65,8 @@ impl Default for Players {
             original_team: Comp::default(),
             attributes: Comp::default(),
             deceased: Comp::default(),
+
+            statistics: Comp::default(),
         }
     }
 }
