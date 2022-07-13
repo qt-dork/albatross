@@ -20,3 +20,5 @@ pub mod modifications;
 pub mod attributes;
 pub mod types;
 pub mod mixed_name_gen;
+pub mod bases;
+pub mod outcomes;

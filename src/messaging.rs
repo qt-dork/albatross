@@ -2,7 +2,7 @@
 /// This is directly inspired by RustRoguelike's messaging system, which you can find here:
 /// https://github.com/nsmryan/RustRoguelike/blob/master/roguelike_core/src/messaging.rs
 
-use std::collections::VecDeque;
+use std::{collections::VecDeque, time::Duration};
 
 use crate::{comp::{TeamId, PlayerId}, league::League};
 
@@ -263,7 +263,8 @@ impl Message {
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct MessageLog {
     pub messages: VecDeque<Message>,
-    pub time: VecDeque<u128>,
+    // I used to use a u128, but I felt that a Duration made more sense, however, please feel free to correct me if I'm wrong.
+    pub time: VecDeque<Duration>,
     pub is_special: VecDeque<bool>,
 }
 
@@ -280,20 +281,20 @@ impl MessageLog {
         }
     }
 
-    pub fn pop_front(&mut self) -> Option<(Message, u128)> {
+    pub fn pop_front(&mut self) -> Option<(Message, Duration)> {
         self.messages.pop_front().and_then(|message| {
             self.time.pop_front().map(|time| (message, time))
         })
     }
 
-    pub fn peek(&self) -> Option<(&Message, &u128, &bool)> {
+    pub fn peek(&self) -> Option<(&Message, &Duration, &bool)> {
         let message = self.messages.front()?;
         let time = self.time.front()?;
         let is_special = self.is_special.front()?;
         Some((message, time, is_special))
     }
 
-    pub fn log(&mut self, message: Message, time: u128, is_special: bool) {
+    pub fn log(&mut self, message: Message, time: Duration, is_special: bool) {
         self.messages.push_back(message);
         self.time.push_back(time);
         self.is_special.push_back(is_special);

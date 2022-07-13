@@ -1,3 +1,5 @@
+use crate::{comp::PlayerId, bases::Bases};
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Division {
     UltraDark,
@@ -69,25 +71,6 @@ pub enum Position {
 pub enum Pitching {
     Batter,
     Pitcher
-}
-
-pub enum PitchOutcome {
-    Ball,
-    // Can get a strikeout but the pitch shouldn't handle this imo?
-    StrikeLooking,
-    StrikeSwinging,
-    FoulBall,
-    Flyout,
-    GroundOut,
-    /// Number of bases hit.
-    Hit(u8)
-}
-
-pub enum StealOutcome {
-    /// The player has successfully stolen the base
-    Steal,
-    /// The player was caught stealing
-    CaughtStealing,
 }
 
 #[derive(Clone, Debug, PartialEq)]

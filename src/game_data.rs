@@ -1,4 +1,6 @@
 
+use std::time::Duration;
+
 use crate::java_random::Random;
 use crate::comp::{Comp, CompIter, EntityId, TeamId, PlayerId, GameId};
 use crate::league::League;
@@ -149,5 +151,22 @@ impl GameDatum {
             self.away_has_scored = true;
         }
         // self.log.log(Message::Scores(player), time, is_special)
+    }
+
+    /// Logs a message to the game log. This is a wrapper around the [`MessageLog::log`] function.
+    /// 
+    /// All log functions except [`GameDatum::log_with_time`] assume that you're logging a message at the current time.
+    pub fn log(&mut self, message: Message) {
+        let time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap();
+        self.log.log(message, time, false);
+    }
+
+    pub fn log_with_time(&mut self, message: Message, time: Duration) {
+        self.log.log(message, time, false);
+    }
+
+    pub fn log_special(&mut self, message: Message) {
+        let time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap();
+        self.log.log(message, time, true);
     }
 }
