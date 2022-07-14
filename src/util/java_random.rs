@@ -1,3 +1,12 @@
+//! This library has been dropped in favor
+//! of using `rng`, which is based off 
+//! of the `oorandom` crate.
+//! 
+//! Future versions of albatross will not
+//! use this library, and it may be
+//! removed completely upon release.
+
+
 // This is a simplified version of the Jandom library,
 // located at: https://github.com/kallekankaanpaa/jandom
 // It's the most accurate version to the original java

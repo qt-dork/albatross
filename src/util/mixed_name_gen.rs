@@ -1,4 +1,13 @@
-// todo: make random name generator
+//! This library has been dropped in favor
+//! of using `name_generator`, a name
+//! generator which is based off of a
+//! markov chain, instead of whatever the
+//! hell this is.
+//! 
+//! Future versions of albatross will not
+//! use this library, and it may be
+//! removed completely upon release.
+
 // I think it'd be nice to make this a markov chain at a later point in time, but for now it'll just be the regular name generator.
 
 use crate::util::java_random::Random;

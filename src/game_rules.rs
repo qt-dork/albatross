@@ -8,7 +8,7 @@ use crate::util::types::*;
 use crate::player::statistics::Statistic;
 use crate::player::*;
 
-use crate::outcomes::{StealOutcomes, StealOutcome};
+use crate::outcomes::{PitchOutcome, StealOutcomes, StealOutcome};
 use crate::game_data::*;
 use crate::bases::Bases;
 
@@ -172,3 +172,6 @@ pub fn process_steal_outcome(league: &mut League, game_state: &mut GameDatum, ba
 	new_bases
 }
 
+pub fn handle_pitch(league: &League, rng: &mut Rand32, pitcher: &PlayerId, batter: &PlayerId, defender: &PlayerId) -> PitchOutcome {
+	
+}
