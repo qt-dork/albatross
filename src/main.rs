@@ -1,11 +1,13 @@
 use std::time::{Duration, SystemTime};
 
-use alt_league_blaseball::{league::League, messaging::Message};
+use albatross::league::League;
+// use albatross::util::name_generator::name_generator::NameGenerator;
+// use albatross::util::rng::Rand32;
 
 fn main() {
-    let mut league = League::default();
+    let mut league = League::new();
     league.initialize_teams();
-
+    println!("{:#?}", league.players.name);
 }
 
 // Thought on structure

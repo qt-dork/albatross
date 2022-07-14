@@ -1,4 +1,5 @@
-use crate::{bases::Bases, comp::PlayerId};
+use crate::util::comp::PlayerId;
+use crate::bases::Bases;
 
 pub enum PitchOutcome {
   Ball,

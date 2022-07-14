@@ -1,4 +1,5 @@
-use crate::{comp::PlayerId, bases::Bases};
+use crate::util::comp::PlayerId;
+use crate::bases::Bases;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Division {

@@ -1,16 +1,21 @@
-use crate::comp::*;
-// use crate::game_data::{GameData, GameDatum};
-use crate::java_random::Random;
+
+use crate::util::comp::*;
+use crate::util::name_generator::name_generator::NameGenerator;
+use crate::util::rng::Rand32;
+use crate::util::types::*;
+
+use crate::player::players::*;
 use crate::teams::Teams;
-use crate::players::*;
 use crate::game_results::*;
-use crate::types::*;
+
+// use crate::game_data::{GameData, GameDatum};
 
 const SEED: i64 = -4;
 
 #[derive(Clone, Debug)]
 pub struct League {
-    pub rng: Random,
+    pub rng: Rand32,
+    pub name_generator: NameGenerator,
 
     pub players: Players,
     pub teams: Teams,
@@ -21,7 +26,8 @@ pub struct League {
 impl League {
     pub fn new() -> Self {
         League {
-            rng: Random::new(SEED),
+            rng: Rand32::new(SEED as u64),
+            name_generator: NameGenerator::new(),
             players: Players::default(),
             teams: Teams::default(),
             // game_data: GameData::new(),
@@ -36,7 +42,8 @@ impl League {
         game_results: Vec<GameResult>
     ) -> Self {
         League {
-            rng: Random::new(SEED),
+            rng: Rand32::new(SEED as u64),
+            name_generator: NameGenerator::new(),
             players,
             teams,
             // game_data,
@@ -79,16 +86,25 @@ impl League {
             ("Crepes","French","🥞","FRC", Division::ModerateLight)
         ];
 
+        // This will panic if it fails because otherwise I can't generate names
+        self.name_generator.load_names().expect("Failed to load names from file");
+
         // Note that this will all become unnecessary when we have a proper database
         teams.iter().for_each(|(name, location, logo, abbreviation, division)| {
             // Create Team
             let team = self.teams.create_team(name, location, logo, abbreviation, *division);
 
             // Create Players
-            let lineup: Vec<PlayerId> = (0..9).map(|_| self.players.create_player(&mut self.rng, team)).collect();
+            let lineup: Vec<PlayerId> = (0..9).map(|_| {
+                let name = self.name_generator.generate_name(&mut self.rng);
+                self.players.create_player(&mut self.rng, name, team)
+            }).collect();
             self.teams.lineup.insert(team, lineup);
 
-            let rotation: Vec<PlayerId> = (0..5).map(|_| self.players.create_player(&mut self.rng, team)).collect();
+            let rotation: Vec<PlayerId> = (0..5).map(|_| {
+                let name = self.name_generator.generate_name(&mut self.rng);
+                self.players.create_player(&mut self.rng, name, team)
+            }).collect();
             self.teams.rotation.insert(team, rotation);
         });
     }
@@ -111,7 +127,8 @@ impl League {
 impl Default for League {
     fn default() -> Self {
         League {
-            rng: Random::new(SEED),
+            rng: Rand32::new(SEED as u64),
+            name_generator: NameGenerator::new(),
             players: Players::default(),
             teams: Teams::default(),
             // game_data: GameData::default(),

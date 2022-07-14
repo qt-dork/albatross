@@ -1,12 +1,15 @@
 use crate::league::*;
-use crate::messaging::Message;
-use crate::outcomes::{StealOutcomes, StealOutcome};
+
+use crate::util::rng::Rand32;
+use crate::util::messaging::Message;
+use crate::util::comp::*;
+use crate::util::types::*;
+
+use crate::player::statistics::Statistic;
 use crate::player::*;
-use crate::java_random::Random;
+
+use crate::outcomes::{StealOutcomes, StealOutcome};
 use crate::game_data::*;
-use crate::statistics::Statistic;
-use crate::comp::*;
-use crate::types::*;
 use crate::bases::Bases;
 
 // TODO: Make return `Result`
@@ -15,7 +18,8 @@ use crate::bases::Bases;
 pub fn kill_player(league: &mut League, player_id: PlayerId) -> PlayerId {
 	league.players.deceased[&player_id] = true;
 	let (position, team) = league.teams.contains(player_id).unwrap();
-	let new_player = league.players.create_player(&mut league.rng, team);
+	let name = league.name_generator.generate_name(&mut league.rng);
+	let new_player = league.players.create_player(&mut league.rng, name, team);
 	match position {
 		// Replaces the dead player on the lineup with a new player.
 		Position::Lineup => {
@@ -61,27 +65,27 @@ pub fn random_defender(league: &League, team: TeamId) -> Option<PlayerId> {
 	let mut rng = league.rng;
 	let defenders = league.teams.lineup.get(&team)?;
 	
-	Some(defenders[(rng.next_u32() % defenders.len() as u32) as usize])
+	Some(defenders[(rng.rand_u32() % defenders.len() as u32) as usize])
 }
 
-pub fn random_baserunner(rng: &mut Random, bases: Bases) -> Option<PlayerId> {
+pub fn random_baserunner(rng: &mut Rand32, bases: Bases) -> Option<PlayerId> {
 	let occupied_bases: Vec<PlayerId> = bases.iter().filter_map(|base| *base).collect();
 	if occupied_bases.is_empty() {
 		None
 	} else {
-		Some(occupied_bases[rng.next_u32() as usize % occupied_bases.len()])
+		Some(occupied_bases[rng.rand_u32() as usize % occupied_bases.len()])
 	}
 }
 
 /// This function runs on a successful urge check to see if the baserunner even wants to try to steal a base.
 /// 
-pub fn steal(league: &League, rng: &mut Random, player: &PlayerId, defender: &PlayerId) -> Option<StealOutcome> {
+pub fn steal(league: &League, rng: &mut Rand32, player: &PlayerId, defender: &PlayerId) -> Option<StealOutcome> {
 	// Get the player's attributes for use in the steal
 	let player_attributes = league.players.attributes.get(player)?;
 	let defender_attributes = league.players.attributes.get(defender)?;
 
-	let steal_value = rng.next_f64() * 10. + player_attributes.dexterity.value();
-	let defense_value = rng.next_f64() * 10. + defender_attributes.wisdom.value();
+	let steal_value = rng.rand_f64() * 10. + player_attributes.dexterity.value();
+	let defense_value = rng.rand_f64() * 10. + defender_attributes.wisdom.value();
 
 	if steal_value > defense_value {
 		return Some(StealOutcome::Steal);
@@ -90,11 +94,11 @@ pub fn steal(league: &League, rng: &mut Random, player: &PlayerId, defender: &Pl
 	}
 }
 
-pub fn attempt_steal(league: &League, rng: &mut Random, player: &PlayerId, defender: &PlayerId) -> Option<StealOutcome> {
+pub fn attempt_steal(league: &League, rng: &mut Rand32, player: &PlayerId, defender: &PlayerId) -> Option<StealOutcome> {
 	let player_arrogance = league.players.attributes.get(player)?.arrogance.value();
 	let defender_rejection = league.players.attributes.get(defender)?.rejection.value();
 
-	let urge = rng.next_f64() * 10. + player_arrogance / 3. - defender_rejection / 3.;
+	let urge = rng.rand_f64() * 10. + player_arrogance / 3. - defender_rejection / 3.;
 	if urge >= 9.95 {
 		return steal(league, rng, player, defender);
 	} else {
@@ -102,7 +106,7 @@ pub fn attempt_steal(league: &League, rng: &mut Random, player: &PlayerId, defen
 	}
 }
 
-pub fn handle_steal(league: &League, rng: &mut Random, bases: &Bases, defender: &PlayerId) -> StealOutcomes {
+pub fn handle_steal(league: &League, rng: &mut Rand32, bases: &Bases, defender: &PlayerId) -> StealOutcomes {
 	let mut steal_outcomes = StealOutcomes::new(bases.clone());
 
 	steal_outcomes.steal_outcomes = bases.iter().enumerate().map(|(i, &base)| {
@@ -168,40 +172,3 @@ pub fn process_steal_outcome(league: &mut League, game_state: &mut GameDatum, ba
 	new_bases
 }
 
-/// Removes a player from the bases.
-/// This function probably isn't particularly useful, since it removes all instances of a player, even if they're on multiple bases.
-/// Use `clear_base_number` instead if you're trying to remove a position from a base.
-pub fn clear_base(bases: &[Option<PlayerId>], player: &PlayerId) -> Vec<Option<PlayerId>> {
-	bases.iter()
-		.map(|option_base|
-			if let Some(base) = option_base {
-				if base == player {
-					None
-				} else {
-					Some(*base)
-				}
-			} else {
-				None
-			})
-		.collect()
-}
-
-/// Removes a player from a specific base position.
-/// An alternative to `clear_base` if a player appears on multiple bases or you're trying to remove a player by position instead of by player.
-pub fn clear_base_number(bases: &[Option<PlayerId>], position: usize) -> Vec<Option<PlayerId>> {
-	let mut new_bases = bases.to_vec();
-	new_bases[position] = None;
-	new_bases
-}
-
-// Removes every player from the bases.
-pub fn clear_bases(bases: &[Option<PlayerId>]) -> Vec<Option<PlayerId>> {
-	bases.iter()
-		.map(|option_base|
-			if let Some(base) = option_base {
-				None
-			} else {
-				None
-			})
-		.collect()
-}

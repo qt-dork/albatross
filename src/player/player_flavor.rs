@@ -1,26 +1,26 @@
 // use crate::java_random::Random;
 
 
-// #[derive(Debug, Clone, Copy)]
-// pub enum CoffeeStyle {
-//   Latte,
-//   ColdBrew,
-//   CreamAndSugar,
-//   Blood,
-//   PlentyOfSugar,
-//   Decaf,
-//   FlatWhite,
-//   Macchiato,
-//   MilkSubstitute,
-//   LightAndSweet,
-//   Americano,
-//   Espresso,
-//   HeavyFoam,
-//   CoffeeQuestion,
-//   Black,
-//   Anything,
-//   Tea,
-// }
+#[derive(Debug, Clone, Copy)]
+pub enum CoffeeStyle {
+  Latte,
+  ColdBrew,
+  CreamAndSugar,
+  Blood,
+  PlentyOfSugar,
+  Decaf,
+  FlatWhite,
+  Macchiato,
+  MilkSubstitute,
+  LightAndSweet,
+  Americano,
+  Espresso,
+  HeavyFoam,
+  CoffeeQuestion,
+  Black,
+  Anything,
+  Tea,
+}
 // const COFFEE_VARIANTS: &[CoffeeStyle] = &[
 //   CoffeeStyle::Latte,
 //   CoffeeStyle::ColdBrew,

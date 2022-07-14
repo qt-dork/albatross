@@ -1,7 +1,7 @@
 // todo: make random name generator
 // I think it'd be nice to make this a markov chain at a later point in time, but for now it'll just be the regular name generator.
 
-use crate::java_random::Random;
+use crate::util::java_random::Random;
 
 const LETTERS: &str = "abcdefghijklmnopqrstuvwxyz";
 const CONSONANTS: &str = "bcdfghjklmnpqrstvwxyz";

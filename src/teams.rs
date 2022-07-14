@@ -1,5 +1,5 @@
-use crate::comp::*;
-use crate::types::{Division, Position};
+use crate::util::comp::*;
+use crate::util::types::{Division, Position};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Teams {

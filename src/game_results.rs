@@ -1,8 +1,8 @@
 use uuid::{Uuid, Builder};
 
-use crate::comp::*;
-use crate::types::GameKind;
-use crate::messaging::{Message, MessageLog};
+use crate::util::comp::*;
+use crate::util::types::GameKind;
+use crate::util::messaging::{Message, MessageLog};
 use crate::weather::Weather;
 
 

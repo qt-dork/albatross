@@ -1,9 +1,10 @@
-use crate::player_stat::*;
-use crate::java_random::Random;
+use crate::player::player_stat::*;
+use crate::util::rng::Rand32;
 
 // There's bound to be other stuff but at the very least, this cleans stuff up
 #[derive(Clone, Debug, PartialEq)]
 pub struct Attributes {
+    // TODO: Come up with custom attributes later.
     pub aggression: PlayerStat,
     pub arrogance: PlayerStat,
     pub carcinization: PlayerStat,
@@ -123,28 +124,28 @@ impl Attributes {
         }
     }
 
-    pub fn random(rng: &mut Random) -> Self {
+    pub fn random(rng: &mut Rand32) -> Self {
         Attributes::from_f64(
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64(), 
-            rng.next_f64()
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64(), 
+            rng.rand_f64()
         )
     }
 }

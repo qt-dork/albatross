@@ -1,11 +1,12 @@
 [package]
-name = "alt_league_blaseball"
+name = "albatross"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
-[dependencies.uuid]
-version = "1.1.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+unicode-segmentation = "1.9.0"
+uuid = "1.1.2"

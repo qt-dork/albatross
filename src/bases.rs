@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-use crate::comp::PlayerId;
+use crate::util::comp::PlayerId;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Bases {
@@ -183,6 +183,31 @@ impl Bases {
 	pub fn is_empty(&self) -> bool {
 		self.bases.iter().all(|base| base.is_none())
 	}
+
+  /// Removes every player from the bases.
+  /// 
+  /// This function works differently than `default()` or `new()` in that it maintains the current size of the bases.
+  pub fn clear(&mut self) {
+    *self = Bases::new(self.size);
+  }
+
+  /// Removes a player from the bases.
+  /// 
+  /// This function probably isn't particularly useful, since it removes all instances of a player, even if they're on multiple bases.
+  /// Use `clear_at` instead if you're trying to remove a position from a base.
+  pub fn clear_player(&mut self, player: &PlayerId) {
+    for base in self.bases.iter_mut() {
+      if base.is_some() && base.unwrap() == *player {
+        *base = None;
+      }
+    }
+  }
+
+  /// Removes a player from a specific base position.
+  /// An alternative to `clear_player` if a player appears on multiple bases or you're trying to remove a player by position instead of by player.
+  pub fn clear_at(&mut self, position: usize) {
+    self.bases[position] = None;
+  }
 
 	/// Returns the number of players on the bases.
 	pub fn len(&self) -> usize {

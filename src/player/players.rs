@@ -1,9 +1,9 @@
-use crate::comp::*;
-use crate::java_random::Random;
-use crate::mixed_name_gen::MixedNameGenerator;
-use crate::player_stat::*;
-use crate::attributes::*;
-use crate::statistics::*;
+use crate::util::comp::*;
+use crate::util::rng::Rand32;
+use crate::util::name_generator::name_generator::NameGenerator;
+
+use super::attributes::*;
+use super::statistics::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Players {
@@ -29,15 +29,10 @@ pub struct Players {
 }
 
 impl Players {
-    pub fn create_player(&mut self, rng: &mut Random, team_id: TeamId) -> PlayerId {
+    pub fn create_player(&mut self, rng: &mut Rand32, name: String, team_id: TeamId) -> PlayerId {
         let id = self.next_id;
         self.next_id += 1;
         self.id.push(id);
-
-        let mut gen = MixedNameGenerator::new(rng.seed());
-        let range = gen.random(1, 5) + gen.random(1, 5);
-        let name = gen.next_name_with_distribution() + " " + &gen.distribution_with_length(range);
-        rng.set_seed(gen.seed());
 
         // insert stuff
         self.name.insert(id, name);

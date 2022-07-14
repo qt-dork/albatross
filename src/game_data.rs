@@ -1,10 +1,10 @@
 
 use std::time::Duration;
 
-use crate::java_random::Random;
-use crate::comp::{Comp, CompIter, EntityId, TeamId, PlayerId, GameId};
+use crate::util::rng::Rand32;
+use crate::util::comp::*;
 use crate::league::League;
-use crate::messaging::{Message, MessageLog};
+use crate::util::messaging::{Message, MessageLog};
 use crate::weather::Weather;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -46,7 +46,7 @@ impl GameData {
 pub struct GameDatum {
     pub id: GameId,
 
-    pub rng: Random,
+    pub rng: Rand32,
 
     pub home: TeamId,
     pub away: TeamId,
@@ -111,7 +111,7 @@ impl GameDatum {
         };
         GameDatum {
             id,
-            rng: Random::new(seed as i64),
+            rng: Rand32::new(seed as u64),
             home,
             away,
             home_pitcher: 0,

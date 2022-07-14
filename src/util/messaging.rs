@@ -4,7 +4,8 @@
 
 use std::{collections::VecDeque, time::Duration};
 
-use crate::{comp::{TeamId, PlayerId}, league::League};
+use crate::util::comp::{TeamId, PlayerId};
+use crate::league::League;
 
 pub type BallsStrikes = (i32, i32);
 
